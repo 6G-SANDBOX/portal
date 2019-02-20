@@ -11,7 +11,9 @@
         {{ wtf.quick_form(form) }}
         <br>
     {% endif %}
+    <table class="table table-hover">
     {% for experiment in experiments %}
         {% include '_experiment.html' %}
     {% endfor %}
+    </table>
 {% endblock %}

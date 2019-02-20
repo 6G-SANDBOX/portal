@@ -19,7 +19,7 @@ class User(UserMixin, db.Model):
     experiments = db.relationship('Experiment', backref='author', lazy='dynamic')
 
     def __repr__(self):
-        return '<User {}>'.format(self.username)
+        return f'<User {self.username}>'
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -52,4 +52,4 @@ class Experiment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
-        return '<Experiment {}>'.format(self.name)
+        return f'<Experiment {self.name}>'
