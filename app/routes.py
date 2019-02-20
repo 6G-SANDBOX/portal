@@ -1,17 +1,26 @@
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
-from app.models import User
+from app.models import User, Experiment
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
+from app.forms import ExperimentForm
 from app.email import send_password_reset_email
 
 
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-    return render_template('index.html', title='Home')
+    form = ExperimentForm()
+    if form.validate_on_submit():
+        experiment = Experiment(name=form.name.data, author=current_user)
+        db.session.add(experiment)
+        db.session.commit()
+        flash('Your experiment has been created')
+        return redirect(url_for('index'))
+    experiments = current_user.user_experiments()
+    return render_template('index.html', title='Home', form=form, experiments=experiments)
 
 
 @app.route('/register', methods=['GET', 'POST'])

@@ -32,6 +32,10 @@ class User(UserMixin, db.Model):
             {'reset_password': self.id, 'exp': time() + expires_in},
             app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
+    def user_experiments(self):
+        exp = Experiment.query.filter_by(user_id=self.id)
+        return exp.order_by(Experiment.id.desc())
+
     @staticmethod
     def verify_reset_password_token(token):
         try:
@@ -48,4 +52,4 @@ class Experiment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
-        return '<Experiment {}>'.format(self.body)
+        return '<Experiment {}>'.format(self.name)

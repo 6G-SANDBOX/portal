@@ -2,9 +2,16 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-    <h1>Hi, {{ current_user.username }}!</h1>
+    <h2>Hi, {{ current_user.username }}!</h2>
+    <hr>
+    </br>
+    </br>
+    <h3>Create experiments:</h3>
     {% if form %}
         {{ wtf.quick_form(form) }}
         <br>
     {% endif %}
+    {% for experiment in experiments %}
+        {% include '_experiment.html' %}
+    {% endfor %}
 {% endblock %}
