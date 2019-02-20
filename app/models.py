@@ -1,9 +1,10 @@
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from app import app,login
+from app import app, login
 from time import time
 import jwt
+
 
 @login.user_loader
 def load_user(id):
@@ -15,6 +16,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+    experiments = db.relationship('Experiment', backref='author', lazy='dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -38,3 +40,12 @@ class User(UserMixin, db.Model):
         except:
             return
         return User.query.get(id)
+
+
+class Experiment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    def __repr__(self):
+        return '<Experiment {}>'.format(self.body)
