@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, HiddenField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
 from app.models import User
 
@@ -45,3 +45,8 @@ class ResetPasswordForm(FlaskForm):
 class ExperimentForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     submit = SubmitField('Add Experiment')
+
+
+class RunExperimentForm(FlaskForm):
+    id = HiddenField("id")
+    submit = SubmitField('Run')

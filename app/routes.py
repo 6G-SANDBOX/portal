@@ -3,7 +3,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from app.models import User, Experiment
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
+from app.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm, RunExperimentForm
 from app.forms import ExperimentForm
 from app.email import send_password_reset_email
 
@@ -13,6 +13,7 @@ from app.email import send_password_reset_email
 @login_required
 def index():
     form = ExperimentForm()
+
     if form.validate_on_submit():
         experiment = Experiment(name=form.name.data, author=current_user)
         db.session.add(experiment)
@@ -20,7 +21,11 @@ def index():
         flash('Your experiment has been created')
         return redirect(url_for('index'))
     experiments = current_user.user_experiments()
-    return render_template('index.html', title='Home', form=form, experiments=experiments)
+    formrun = RunExperimentForm()
+    if formrun.validate_on_submit():
+        flash('Pressed ExperimentID:'+formrun.id.data+" - UserID:"+str(current_user.id))
+        return redirect(url_for('index'))
+    return render_template('index.html', title='Home', form=form, formRun=formrun, experiments=experiments)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -91,4 +96,3 @@ def reset_password(token):
         flash('Your password has been reset.')
         return redirect(url_for('login'))
     return render_template('reset_password.html', form=form)
-

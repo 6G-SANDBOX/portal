@@ -5,4 +5,11 @@
             <td>
                 {{ experiment.name }}
             </td>
+            <td>
+                <form id="formRun" action="" method="post" novalidate>
+                    {{ form.hidden_tag() }}
+                    <input type="hidden" name="id" value="{{ experiment.id }}" />
+                    <p>{{ form.submit() }}</p>
+                </form>
+            </td>
         </tr>
