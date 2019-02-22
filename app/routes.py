@@ -1,11 +1,14 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
+
+from REST import Dispatcher_Api
 from app.models import User, Experiment
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm, RunExperimentForm
 from app.forms import ExperimentForm
 from app.email import send_password_reset_email
+import json
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -23,7 +26,10 @@ def index():
     experiments = current_user.user_experiments()
     formrun = RunExperimentForm()
     if formrun.validate_on_submit():
-        flash('Pressed ExperimentID:'+formrun.id.data+" - UserID:"+str(current_user.id))
+        api = Dispatcher_Api("127.0.0.1", "5000", "/api/v0")  # //api/v0
+        jsonresponse = api.Post(formrun.id.data, current_user.id)
+        print(jsonresponse)
+        flash('Pressed ExperimentID:'+str(jsonresponse['Experiment'])+" - UserID:"+str(jsonresponse['User']))
         return redirect(url_for('index'))
     return render_template('index.html', title='Home', form=form, formRun=formrun, experiments=experiments)
 
@@ -96,3 +102,4 @@ def reset_password(token):
         flash('Your password has been reset.')
         return redirect(url_for('login'))
     return render_template('reset_password.html', form=form)
+

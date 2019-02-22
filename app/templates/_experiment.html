@@ -6,10 +6,10 @@
                 {{ experiment.name }}
             </td>
             <td>
-                <form id="formRun" action="" method="post" novalidate>
+                <form id="formRun" method="post" novalidate>
                     {{ form.hidden_tag() }}
                     <input type="hidden" name="id" value="{{ experiment.id }}" />
-                    <p>{{ form.submit() }}</p>
+                    <p>{{ formRun.submit() }}</p>
                 </form>
             </td>
         </tr>
