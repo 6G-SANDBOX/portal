@@ -26,10 +26,15 @@ def index():
     experiments = current_user.user_experiments()
     formrun = RunExperimentForm()
     if formrun.validate_on_submit():
-        api = Dispatcher_Api("127.0.0.1", "5000", "/api/v0")  # //api/v0
-        jsonresponse = api.Post(formrun.id.data, current_user.id)
-        print(jsonresponse)
-        flash('Pressed ExperimentID:'+str(jsonresponse['Experiment'])+" - UserID:"+str(jsonresponse['User']))
+        try:
+            api = Dispatcher_Api("127.0.0.1", "5000", "/api/v0")  # //api/v0
+            jsonresponse = api.Post(formrun.id.data, formrun.exp_name.data, formrun.exp_author.data)
+            flash(f'Success: {jsonresponse["Success"]} - Execution Id: '
+                  f'{jsonresponse["ExecutionId"]} - Message: {jsonresponse["Message"]}')
+
+        except Exception as e:
+            flash(f'Exception while trying to connect with dispatcher: {e}')
+
         return redirect(url_for('index'))
     return render_template('index.html', title='Home', form=form, formRun=formrun, experiments=experiments)
 
@@ -102,4 +107,3 @@ def reset_password(token):
         flash('Your password has been reset.')
         return redirect(url_for('login'))
     return render_template('reset_password.html', form=form)
-
