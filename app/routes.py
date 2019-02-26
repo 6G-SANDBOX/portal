@@ -27,7 +27,7 @@ def index():
     if formrun.validate_on_submit():
         try:
             api = Dispatcher_Api("127.0.0.1", "5001", "/api/v0")  # //api/v0
-            jsonresponse = api.Post(formrun.id.data, formrun.exp_name.data, formrun.exp_author.data)
+            jsonresponse = api.Post(formrun.id.data)
             flash(f'Success: {jsonresponse["Success"]} - Execution Id: '
                   f'{jsonresponse["ExecutionId"]} - Message: {jsonresponse["Message"]}')
 

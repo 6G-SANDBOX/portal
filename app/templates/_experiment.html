@@ -9,8 +9,6 @@
                 <form id="formRun" method="post" novalidate>
                     {{ form.hidden_tag() }}
                     <input type="hidden" name="id" value="{{ experiment.id }}" />
-                    <input type="hidden" name="exp_name" value="{{ experiment.name }}" />
-                    <input type="hidden" name="exp_author" value="{{ experiment.user_id }}" />
                     <p>{{ formRun.submit() }}</p>
                 </form>
             </td>
