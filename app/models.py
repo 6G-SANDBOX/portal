@@ -45,6 +45,13 @@ class User(UserMixin, db.Model):
             return
         return User.query.get(id)
 
+    def serialization(self):
+        experiments_ids = []
+        for exp in self.user_experiments():
+            experiments_ids.append(exp.id)
+        dictionary = {'Id': self.id, 'UserName': self.username, 'Email': self.email, 'Experiments': experiments_ids}
+        return dictionary
+
 
 class Experiment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -53,3 +60,7 @@ class Experiment(db.Model):
 
     def __repr__(self):
         return f'<Experiment {self.name}>'
+
+    def serialization(self):
+        dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization()}
+        return dictionary
