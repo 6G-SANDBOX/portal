@@ -57,6 +57,7 @@ class Experiment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    executions = db.relationship('Execution', backref='experiment', lazy='dynamic')
 
     def __repr__(self):
         return f'<Experiment {self.name}>'
@@ -64,3 +65,14 @@ class Experiment(db.Model):
     def serialization(self):
         dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization()}
         return dictionary
+
+
+class Execution(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    experiment_id = db.Column(db.Integer, db.ForeignKey('experiment.id'))
+    start_time = db.Column(db.DATETIME)
+    end_time = db.Column(db.DATETIME)
+    status = db.Column(db.String(32))
+
+    def __repr__(self):
+        return f'<Execution {self.id}>'
