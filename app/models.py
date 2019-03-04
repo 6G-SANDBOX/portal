@@ -71,7 +71,7 @@ class Experiment(db.Model):
 class Execution(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     experiment_id = db.Column(db.Integer, db.ForeignKey('experiment.id'))
-    start_time = db.Column(db.DATETIME, default=datetime.utcnow)
+    start_time = db.Column(db.DATETIME)
     end_time = db.Column(db.DATETIME)
     status = db.Column(db.String(32))
 

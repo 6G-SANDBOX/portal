@@ -9,6 +9,7 @@ from app.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, Res
 from app.forms import ExperimentForm
 from app.email import send_password_reset_email
 import json
+from datetime import datetime
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -25,17 +26,16 @@ def index():
     experiments = current_user.user_experiments()
     formrun = RunExperimentForm()
     if formrun.validate_on_submit():
-        execution = Execution(experiment_id=formrun.id.data, status='Init')
-        db.session.add(execution)
-        db.session.commit()
-        #try:
-        #    api = Dispatcher_Api("127.0.0.1", "5001", "/api/v0")  # //api/v0
-        #    jsonresponse = api.Post(formrun.id.data)
-        #    flash(f'Success: {jsonresponse["Success"]} - Execution Id: '
-        #          f'{jsonresponse["ExecutionId"]} - Message: {jsonresponse["Message"]}')
-
-        #except Exception as e:
-        #    flash(f'Exception while trying to connect with dispatcher: {e}')
+        try:
+            api = Dispatcher_Api("127.0.0.1", "5001", "/api/v0")  # //api/v0
+            jsonresponse = api.Post(formrun.id.data)
+            flash(f'Success: {jsonresponse["Success"]} - Execution Id: '
+                  f'{jsonresponse["ExecutionId"]} - Message: {jsonresponse["Message"]}')
+            execution = Execution(id=jsonresponse["ExecutionId"], experiment_id=formrun.id.data, status='Init')
+            db.session.add(execution)
+            db.session.commit()
+        except Exception as e:
+            flash(f'Exception while trying to connect with dispatcher: {e}')
 
         return redirect(url_for('index'))
     return render_template('index.html', title='Home', form=form, formRun=formrun, experiments=experiments)
@@ -109,3 +109,17 @@ def reset_password(token):
         flash('Your password has been reset.')
         return redirect(url_for('login'))
     return render_template('reset_password.html', form=form)
+
+
+@app.route('/api/execution/<execution_id>', methods=['PATCH'])
+def set_execution_status(execution_id):
+    data = json.loads(request.data.decode('utf8'))
+    execution = Execution.query.get(int(execution_id))
+    if data["Status"] in ['PreRun']:
+        execution.start_time = datetime.utcnow()
+    elif data["Status"] in ['Finished', 'Cancelled', 'Errored']:
+        execution.end_time = datetime.utcnow()
+    execution.status = data["Status"]
+    db.session.commit()
+    print('Status of Execution ' + str(execution.id) + ' changed to ' + execution.status)
+    return ""
