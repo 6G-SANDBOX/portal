@@ -4,6 +4,7 @@ from flask_login import UserMixin
 from app import app, login
 from time import time
 import jwt
+from datetime import datetime
 
 
 @login.user_loader
@@ -19,7 +20,7 @@ class User(UserMixin, db.Model):
     experiments = db.relationship('Experiment', backref='author', lazy='dynamic')
 
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f'<User {self.id}, Username {self.username}, Email {self.email}>'
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -60,7 +61,7 @@ class Experiment(db.Model):
     executions = db.relationship('Execution', backref='experiment', lazy='dynamic')
 
     def __repr__(self):
-        return f'<Experiment {self.name}>'
+        return f'<Experiment {self.id}, Name {self.name}, User_id {self.user_id}>'
 
     def serialization(self):
         dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization()}
@@ -70,9 +71,9 @@ class Experiment(db.Model):
 class Execution(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     experiment_id = db.Column(db.Integer, db.ForeignKey('experiment.id'))
-    start_time = db.Column(db.DATETIME)
+    start_time = db.Column(db.DATETIME, default=datetime.utcnow)
     end_time = db.Column(db.DATETIME)
     status = db.Column(db.String(32))
 
     def __repr__(self):
-        return f'<Execution {self.id}>'
+        return f'<Execution {self.id}, Experiment_id {self.experiment_id}, Start_time {self.start_time}, End_time {self.end_time}, Status {self.status}>'

@@ -3,7 +3,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 
 from REST import Dispatcher_Api
-from app.models import User, Experiment
+from app.models import User, Experiment, Execution
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm, RunExperimentForm
 from app.forms import ExperimentForm
@@ -25,14 +25,17 @@ def index():
     experiments = current_user.user_experiments()
     formrun = RunExperimentForm()
     if formrun.validate_on_submit():
-        try:
-            api = Dispatcher_Api("127.0.0.1", "5001", "/api/v0")  # //api/v0
-            jsonresponse = api.Post(formrun.id.data)
-            flash(f'Success: {jsonresponse["Success"]} - Execution Id: '
-                  f'{jsonresponse["ExecutionId"]} - Message: {jsonresponse["Message"]}')
+        execution = Execution(experiment_id=formrun.id.data, status='Init')
+        db.session.add(execution)
+        db.session.commit()
+        #try:
+        #    api = Dispatcher_Api("127.0.0.1", "5001", "/api/v0")  # //api/v0
+        #    jsonresponse = api.Post(formrun.id.data)
+        #    flash(f'Success: {jsonresponse["Success"]} - Execution Id: '
+        #          f'{jsonresponse["ExecutionId"]} - Message: {jsonresponse["Message"]}')
 
-        except Exception as e:
-            flash(f'Exception while trying to connect with dispatcher: {e}')
+        #except Exception as e:
+        #    flash(f'Exception while trying to connect with dispatcher: {e}')
 
         return redirect(url_for('index'))
     return render_template('index.html', title='Home', form=form, formRun=formrun, experiments=experiments)
