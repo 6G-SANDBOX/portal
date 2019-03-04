@@ -63,8 +63,15 @@ class Experiment(db.Model):
     def __repr__(self):
         return f'<Experiment {self.id}, Name {self.name}, User_id {self.user_id}>'
 
+    def experiment_executions(self):
+        exp = Execution.query.filter_by(experiment_id=self.id)
+        return exp.order_by(Execution.id.desc())
+
     def serialization(self):
-        dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization()}
+        executions_ids = []
+        for exe in self.experiment_executions():
+            executions_ids.append(exe.id)
+        dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(), 'Executions': executions_ids}
         return dictionary
 
 

@@ -123,3 +123,14 @@ def set_execution_status(execution_id):
     db.session.commit()
     print('Status of Execution ' + str(execution.id) + ' changed to ' + execution.status)
     return ""
+
+
+@app.route('/experiment/<experiment_id>', methods=['GET', 'POST'])
+@login_required
+def experiment(experiment_id):
+    exp = Experiment.query.get(experiment_id)
+    if exp is None:
+        return render_template('404.html')
+    else:
+        executions = exp.experiment_executions()
+    return render_template('experiment.html', title='Experiment', experiment=exp, executions=executions)
