@@ -38,6 +38,9 @@ def create_app(config_class=Config):
     from app.authentication import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/authentication')
 
+    from app.api import bp as api_bp
+    app.register_blueprint(api_bp, url_prefix='/api')
+
     if not app.debug:
         if not os.path.exists('logs'):
             os.mkdir('logs')

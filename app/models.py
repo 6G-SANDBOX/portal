@@ -2,6 +2,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import db, login
 from time import time
+from flask import current_app
 import jwt
 
 
@@ -29,7 +30,7 @@ class User(UserMixin, db.Model):
     def get_reset_password_token(self, expires_in=600):
         return jwt.encode(
             {'reset_password': self.id, 'exp': time() + expires_in},
-            app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+            current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
     def user_experiments(self):
         exp = Experiment.query.filter_by(user_id=self.id)
@@ -38,17 +39,17 @@ class User(UserMixin, db.Model):
     @staticmethod
     def verify_reset_password_token(token):
         try:
-            id = jwt.decode(token, app.config['SECRET_KEY'],
+            id = jwt.decode(token, current_app.config['SECRET_KEY'],
                             algorithms=['HS256'])['reset_password']
         except:
             return
         return User.query.get(id)
 
     def serialization(self):
-        experiments_ids = []
-        for exp in self.user_experiments():
-            experiments_ids.append(exp.id)
-        dictionary = {'Id': self.id, 'UserName': self.username, 'Email': self.email, 'Experiments': experiments_ids}
+        experiment_ids = [exp.id for exp in self.user_experiments()]
+        # for exp in self.user_experiments():
+        #    experiments_ids.append(exp.id)
+        dictionary = {'Id': self.id, 'UserName': self.username, 'Email': self.email, 'Experiments': experiment_ids}
         return dictionary
 
 
@@ -66,10 +67,12 @@ class Experiment(db.Model):
         return exp.order_by(Execution.id.desc())
 
     def serialization(self):
-        executions_ids = []
-        for exe in self.experiment_executions():
-            executions_ids.append(exe.id)
-        dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(), 'Executions': executions_ids}
+        # executions_ids = []
+        execution_ids = [exe.id for exe in self.experiment_executions()]
+
+        # for exe in self.experiment_executions():
+        #    executions_ids.append(exe.id)
+        dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(), 'Executions': execution_ids}
         return dictionary
 
 
