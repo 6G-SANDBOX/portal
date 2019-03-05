@@ -9,7 +9,8 @@
                 <form id="formRun" method="post" novalidate>
                     {{ form.hidden_tag() }}
                     <input type="hidden" name="id" value="{{ experiment.id }}" />
-                    <p>{{ formRun.submit() }}</p>
+                    <button type="submit" name="submit" class="btn btn-primary ">Run Experiment</button>
+                    <a class="btn btn-info" href="/experiment/{{ experiment.id }}" role="button">Executions info</a>
                 </form>
             </td>
         </tr>

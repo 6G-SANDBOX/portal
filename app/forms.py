@@ -49,4 +49,4 @@ class ExperimentForm(FlaskForm):
 
 class RunExperimentForm(FlaskForm):
     id = HiddenField("id")
-    submit = SubmitField('Run')
+    submit = SubmitField('Run Experiment')
