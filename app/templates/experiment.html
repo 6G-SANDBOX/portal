@@ -7,16 +7,20 @@
     </br>
     </br>
     <h3>Executions:</h3>
-    <table class="table table-hover">
-        <tr>
-            <th>Execution ID</th>
-            <th>Status</th>
-            <th>Start Time</th>
-            <th>End Time</th>
-        </tr>
-    {% for execution in executions %}
-        {% include '_execution.html' %}
-    {% endfor %}
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th>Execution ID</th>
+                <th>Status</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for execution in executions %}
+                {% include '_execution.html' %}
+            {% endfor %}
+        </tbody>
     </table>
 
 {% endblock %}

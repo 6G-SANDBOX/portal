@@ -1,14 +1,26 @@
         <tr>
-            <td>
+
+            <th scope="row" class="col-md-2">
                 {{ execution.id }}
+            </th>
+            <td class="col-md-2">
+                {% if execution.status == 'Init' %}
+                <span class="label label-default">{{ execution.status }}</span>
+                {% elif execution.status in ['PreRun', 'Run', 'PostRun'] %}
+                <span class="label label-primary">{{ execution.status }}</span>
+                {% elif execution.status == 'Finished' %}
+                <span class="label label-success">{{ execution.status }}</span>
+                {% elif execution.status == 'Cancelled' %}
+                <span class="label label-warning">{{ execution.status }}</span>
+                {% elif execution.status == 'Errored' %}
+                <span class="label label-danger">{{ execution.status }}</span>
+                {% endif %}
+
             </td>
-            <td>
-                {{ execution.status }}
-            </td>
-            <td>
+            <td class="col-md-4">
                 {{ execution.start_time }}
             </td>
-             <td>
+             <td class="col-md-4">
                 {{ execution.end_time }}
             </td>
         </tr>
