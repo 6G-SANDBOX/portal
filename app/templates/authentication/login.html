@@ -9,9 +9,9 @@
         </div>
     </div>
     <br>
-    <p><a href="{{ url_for('register') }}">Register</a></p>
+    <p><a href="{{ url_for('authentication.register') }}">Register</a></p>
     <p>
         Forgot Your Password?
-        <a href="{{ url_for('reset_password_request') }}">Click to Reset It</a>
+        <a href="{{ url_for('authentication.reset_password_request') }}">Click to Reset It</a>
     </p>
 {% endblock %}

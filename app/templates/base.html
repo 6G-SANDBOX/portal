@@ -14,17 +14,17 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{{ url_for('index') }}">5Genesis</a>
+                <a class="navbar-brand" href="{{ url_for('main.index') }}">5Genesis</a>
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('main.index') }}">Home</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if current_user.is_anonymous %}
-                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('authentication.login') }}">Login</a></li>
                     {% else %}
-                    <li><a href="{{ url_for('logout') }}">{{ current_user.username }} - Logout</a></li>
+                    <li><a href="{{ url_for('authentication.logout') }}">{{ current_user.username }} - Logout</a></li>
                     {% endif %}
                 </ul>
             </div>
