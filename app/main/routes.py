@@ -1,12 +1,11 @@
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_required
-from datetime import datetime
 from REST import Dispatcher_Api
 from app import db
 from app.main import bp
 from app.models import Experiment, Execution
 from app.main.forms import ExperimentForm, RunExperimentForm
-import json
+from Helper import Config
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -24,7 +23,8 @@ def index():
     formrun = RunExperimentForm()
     if formrun.validate_on_submit():
         try:
-            api = Dispatcher_Api("127.0.0.1", "5001", "/api/v0")  # //api/v0
+            helper = Config()
+            api = Dispatcher_Api(helper.Dispatcher.Host, helper.Dispatcher.Port, "/api/v0")  # //api/v0
             jsonresponse = api.Post(formrun.id.data)
             flash(f'Success: {jsonresponse["Success"]} - Execution Id: '
                   f'{jsonresponse["ExecutionId"]} - Message: {jsonresponse["Message"]}')
