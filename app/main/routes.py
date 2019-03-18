@@ -23,8 +23,8 @@ def index():
     formrun = RunExperimentForm()
     if formrun.validate_on_submit():
         try:
-            helper = Config()
-            api = Dispatcher_Api(helper.Dispatcher.Host, helper.Dispatcher.Port, "/api/v0")  # //api/v0
+            config = Config()
+            api = Dispatcher_Api(config.Dispatcher.Host, config.Dispatcher.Port, "/api/v0")  # //api/v0
             jsonresponse = api.Post(formrun.id.data)
             flash(f'Success: {jsonresponse["Success"]} - Execution Id: '
                   f'{jsonresponse["ExecutionId"]} - Message: {jsonresponse["Message"]}')
