@@ -9,7 +9,6 @@ from config import Config
 import os
 import logging
 
-
 db = SQLAlchemy()
 migrate = Migrate()
 login = LoginManager()

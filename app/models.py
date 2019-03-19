@@ -49,8 +49,6 @@ class User(UserMixin, db.Model):
 
     def serialization(self):
         experiment_ids = [exp.id for exp in self.user_experiments()]
-        # for exp in self.user_experiments():
-        #    experiments_ids.append(exp.id)
         dictionary = {'Id': self.id, 'UserName': self.username, 'Email': self.email, 'Experiments': experiment_ids}
         return dictionary
 
@@ -64,18 +62,14 @@ class Experiment(db.Model):
     executions = db.relationship('Execution', backref='experiment', lazy='dynamic')
 
     def __repr__(self):
-        return f'<Experiment {self.id}, Name {self.name}, User_id {self.user_id}>'
+        return f'<Experiment {self.id}, Name {self.name}, User_id {self.user_id}, Type {self.type}, Unattended {self.unattended}>'
 
     def experiment_executions(self):
         exp = Execution.query.filter_by(experiment_id=self.id)
         return exp.order_by(Execution.id.desc())
 
     def serialization(self):
-        # executions_ids = []
         execution_ids = [exe.id for exe in self.experiment_executions()]
-
-        # for exe in self.experiment_executions():
-        #    executions_ids.append(exe.id)
         dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(), 'Executions': execution_ids, "Platform": Config.PLATFORM}
         return dictionary
 
