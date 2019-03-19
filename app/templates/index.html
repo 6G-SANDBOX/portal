@@ -2,25 +2,35 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-    <h3>Create experiments:</h3>
-    {% if form %}
-        {{ wtf.quick_form(form) }}
-    {% endif %}
-    <hr>
+<h3>Create experiments:</h3>
+<form id="form" method="post">
+    {{ form.hidden_tag() }}
+    <h4>Name</h4>
+    <input class="form-control" type="text" name="name"/>
+    <h4>Type</h4>
+    <select class="form-control" name="type">
+        <option value="Standard" selected>Standard</option>
+        <option value="Custom" disabled>Custom</option>
+    </select>
     </br>
-    <h3>Experiments:</h3>
-    <table class="table table-striped">
-        <thead class="thead-dark">
-            <tr>
-                <th>Experiment ID</th>
-                <th>Name</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for experiment in experiments %}
-                {% include '_experiment.html' %}
-            {% endfor %}
-        </tbody>
-    </table>
+    <button type="submit" name="submit" class="btn btn-primary btn-sm">Add Experiment</button>
+</form>
+<hr>
+</br>
+<h3>Experiments:</h3>
+<table class="table table-striped">
+    <thead class="thead-dark">
+    <tr>
+        <th>Experiment ID</th>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for experiment in experiments %}
+    {% include '_experiment.html' %}
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

@@ -14,7 +14,7 @@ from Helper import Config
 def index():
     form = ExperimentForm()
     if form.validate_on_submit():
-        experiment = Experiment(name=form.name.data, author=current_user)
+        experiment = Experiment(name=form.name.data, author=current_user, unattended=True, type=form.type.data)
         db.session.add(experiment)
         db.session.commit()
         flash('Your experiment has been created')
