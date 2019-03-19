@@ -3,6 +3,7 @@ from flask_login import UserMixin
 from app import db, login
 from time import time
 from flask import current_app
+from config import Config
 import jwt
 
 
@@ -75,7 +76,7 @@ class Experiment(db.Model):
 
         # for exe in self.experiment_executions():
         #    executions_ids.append(exe.id)
-        dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(), 'Executions': execution_ids}
+        dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(), 'Executions': execution_ids, "Platform": Config.PLATFORM}
         return dictionary
 
 
