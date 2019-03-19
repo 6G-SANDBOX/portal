@@ -58,6 +58,8 @@ class Experiment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    type = db.Column(db.String(16))
+    unattended = db.Column(db.Boolean)
     executions = db.relationship('Execution', backref='experiment', lazy='dynamic')
 
     def __repr__(self):
