@@ -4,7 +4,33 @@ from app import db, login
 from time import time
 from flask import current_app
 from config import Config
+from sqlalchemy.types import TypeDecorator, VARCHAR
+import json
 import jwt
+
+
+class JSONEncodedDict(TypeDecorator):
+    """Represents an immutable structure as a json-encoded string. Usage::             JSONEncodedDict(255)  """
+
+    @property
+    def python_type(self):
+        pass
+
+    def process_literal_param(self, value, dialect):
+        pass
+
+    impl = VARCHAR
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            value = json.dumps(value)
+
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            value = json.loads(value)
+        return value
 
 
 @login.user_loader
@@ -59,10 +85,11 @@ class Experiment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     type = db.Column(db.String(16))
     unattended = db.Column(db.Boolean)
+    test_cases = db.Column(JSONEncodedDict)
     executions = db.relationship('Execution', backref='experiment', lazy='dynamic')
 
     def __repr__(self):
-        return f'<Experiment {self.id}, Name {self.name}, User_id {self.user_id}, Type {self.type}, Unattended {self.unattended}>'
+        return f'<Experiment {self.id}, Name {self.name}, User_id {self.user_id}, Type {self.type}, Unattended {self.unattended}, TestCases {self.test_cases}>'
 
     def experiment_executions(self):
         exp = Execution.query.filter_by(experiment_id=self.id)
