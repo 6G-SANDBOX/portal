@@ -36,3 +36,7 @@ class Config:
     @property
     def Dispatcher(self):
         return Dispatcher(self.data)
+
+    @property
+    def TestCases(self):
+        return self.data['TestCases']

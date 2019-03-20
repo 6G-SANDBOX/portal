@@ -14,10 +14,14 @@ from Helper import Config
 def index():
     form = ExperimentForm()
     if form.validate_on_submit():
-        experiment = Experiment(name=form.name.data, author=current_user, unattended=True, type=form.type.data)
+        test_cases_selected = request.form.getlist('test_cases')
+        if not test_cases_selected:
+            flash(f'Please, select at least one Test Case', 'error')
+            return redirect(url_for('main.index'))
+        experiment = Experiment(name=form.name.data, author=current_user, unattended=True, type=form.type.data, test_cases=test_cases_selected)
         db.session.add(experiment)
         db.session.commit()
-        flash('Your experiment has been created')
+        flash('Your experiment has been created', 'info')
         return redirect(url_for('main.index'))
     experiments = current_user.user_experiments()
     formrun = RunExperimentForm()
@@ -27,15 +31,16 @@ def index():
             api = Dispatcher_Api(config.Dispatcher.Host, config.Dispatcher.Port, "/api/v0")  # //api/v0
             jsonresponse = api.Post(formrun.id.data)
             flash(f'Success: {jsonresponse["Success"]} - Execution Id: '
-                  f'{jsonresponse["ExecutionId"]} - Message: {jsonresponse["Message"]}')
+                  f'{jsonresponse["ExecutionId"]} - Message: {jsonresponse["Message"]}', 'info')
             execution = Execution(id=jsonresponse["ExecutionId"], experiment_id=formrun.id.data, status='Init')
             db.session.add(execution)
             db.session.commit()
         except Exception as e:
-            flash(f'Exception while trying to connect with dispatcher: {e}')
+            flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
 
         return redirect(url_for('main.index'))
-    return render_template('index.html', title='Home', form=form, formRun=formrun, experiments=experiments)
+    return render_template('index.html', title='Home', form=form, formRun=formrun, experiments=experiments,
+                           test_case_list=Config().TestCases)
 
 
 @bp.route('/experiment/<experiment_id>', methods=['GET', 'POST'])

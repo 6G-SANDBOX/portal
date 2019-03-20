@@ -1,19 +1,40 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
-
 {% block app_content %}
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#checkBtn').click(function() {
+              checked = $("input[type=checkbox]:checked").length;
+              if(!checked) {
+                alert("Please, select at least one Test Case");
+                return false;
+              }
+            });
+        });
+    </script>
+</head>
+
+
 <h3>Create experiments:</h3>
 <form id="form" method="post">
     {{ form.hidden_tag() }}
     <h4>Name</h4>
-    <input class="form-control" type="text" name="name"/>
+    <input class="form-control" type="text" name="name" required/>
     <h4>Type</h4>
     <select class="form-control" name="type">
         <option value="Standard" selected>Standard</option>
         <option value="Custom" disabled>Custom</option>
     </select>
+    <h4>Test Cases</h4>
+    {% for test_case in test_case_list %}
+    <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input" name="test_cases" value="{{test_case}}"> {{test_case}}</br>
+    </div>
+    {% endfor %}
     </br>
-    <button type="submit" name="submit" class="btn btn-primary btn-sm">Add Experiment</button>
+    <button type="submit" id="checkBtn" name="submit" class="btn btn-primary btn-sm">Add Experiment</button>
 </form>
 <hr>
 </br>
