@@ -12,13 +12,16 @@ from Helper import Config
 @bp.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
+    list_UEs = list(Config().UEs.keys())
     form = ExperimentForm()
     if form.validate_on_submit():
         test_cases_selected = request.form.getlist('test_cases')
+        ues_selected = request.form.getlist('ues')
         if not test_cases_selected:
             flash(f'Please, select at least one Test Case', 'error')
             return redirect(url_for('main.index'))
-        experiment = Experiment(name=form.name.data, author=current_user, unattended=True, type=form.type.data, test_cases=test_cases_selected)
+        experiment = Experiment(name=form.name.data, author=current_user, unattended=True, type=form.type.data,
+                                test_cases=test_cases_selected, ues=ues_selected)
         db.session.add(experiment)
         db.session.commit()
         flash('Your experiment has been created', 'info')
@@ -40,7 +43,7 @@ def index():
 
         return redirect(url_for('main.index'))
     return render_template('index.html', title='Home', form=form, formRun=formrun, experiments=experiments,
-                           test_case_list=Config().TestCases)
+                           test_case_list=Config().TestCases, ue_list=list_UEs)
 
 
 @bp.route('/experiment/<experiment_id>', methods=['GET', 'POST'])

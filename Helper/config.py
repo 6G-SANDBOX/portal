@@ -40,3 +40,7 @@ class Config:
     @property
     def TestCases(self):
         return self.data['TestCases']
+
+    @property
+    def UEs(self):
+        return self.data['UEs']

@@ -4,3 +4,7 @@ Dispatcher:
 
 TestCases:
   RTT:
+
+UEs:
+  TestServer1:
+    OS: Linux

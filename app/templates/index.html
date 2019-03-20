@@ -33,6 +33,12 @@
         <input type="checkbox" class="custom-control-input" name="test_cases" value="{{test_case}}"> {{test_case}}</br>
     </div>
     {% endfor %}
+     <h4>UEs</h4>
+    {% for ue in ue_list %}
+    <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input" name="ues" value="{{ue}}"> {{ue}}</br>
+    </div>
+    {% endfor %}
     </br>
     <button type="submit" id="checkBtn" name="submit" class="btn btn-primary btn-sm">Add Experiment</button>
 </form>
