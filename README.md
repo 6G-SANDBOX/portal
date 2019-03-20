@@ -20,7 +20,7 @@ virtualenv venv
 ```
 4. Activate the virtual environment:
 - For Windows:
-```bash
+```powershell
 venv\Scripts\Activate.bat
 ```
 - For Linux:
