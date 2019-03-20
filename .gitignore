@@ -99,3 +99,4 @@ ENV/
 .idea/
 
 app.db
+.vagrant/
