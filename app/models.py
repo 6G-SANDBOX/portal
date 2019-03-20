@@ -7,6 +7,7 @@ from config import Config
 from sqlalchemy.types import TypeDecorator, VARCHAR
 import json
 import jwt
+from Helper import Config as HelperConfig
 
 
 class JSONEncodedDict(TypeDecorator):
@@ -90,7 +91,8 @@ class Experiment(db.Model):
     executions = db.relationship('Execution', backref='experiment', lazy='dynamic')
 
     def __repr__(self):
-        return f'<Experiment {self.id}, Name {self.name}, User_id {self.user_id}, Type {self.type}, Unattended {self.unattended}, TestCases {self.test_cases}>'
+        return f'<Experiment {self.id}, Name {self.name}, User_id {self.user_id}, Type {self.type}, ' \
+            f'Unattended {self.unattended}, TestCases {self.test_cases}>'
 
     def experiment_executions(self):
         exp = Execution.query.filter_by(experiment_id=self.id)
@@ -98,7 +100,16 @@ class Experiment(db.Model):
 
     def serialization(self):
         execution_ids = [exe.id for exe in self.experiment_executions()]
-        dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(), 'Executions': execution_ids, "Platform": Config.PLATFORM}
+        ueDictionary = {}
+        all_UEs = HelperConfig().UEs
+        if self.ues:
+            for ue_key, ue_value in all_UEs.items():
+                if ue_key in self.ues:
+                    ueDictionary[ue_key]=ue_value
+
+        dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(),
+                      'Executions': execution_ids, "Platform": Config.PLATFORM,
+                      "TestCases": self.test_cases, "UEs": ueDictionary}
         return dictionary
 
 
@@ -110,4 +121,5 @@ class Execution(db.Model):
     status = db.Column(db.String(32))
 
     def __repr__(self):
-        return f'<Execution {self.id}, Experiment_id {self.experiment_id}, Start_time {self.start_time}, End_time {self.end_time}, Status {self.status}>'
+        return f'<Execution {self.id}, Experiment_id {self.experiment_id}, Start_time {self.start_time}, ' \
+            f'End_time {self.end_time}, Status {self.status}>'
