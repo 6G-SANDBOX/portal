@@ -86,6 +86,7 @@ class Experiment(db.Model):
     type = db.Column(db.String(16))
     unattended = db.Column(db.Boolean)
     test_cases = db.Column(JSONEncodedDict)
+    ues = db.Column(JSONEncodedDict)
     executions = db.relationship('Execution', backref='experiment', lazy='dynamic')
 
     def __repr__(self):
