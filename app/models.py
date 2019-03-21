@@ -11,7 +11,7 @@ from Helper import Config as HelperConfig
 
 
 class JSONEncodedDict(TypeDecorator):
-    """Represents an immutable structure as a json-encoded string. Usage::             JSONEncodedDict(255)  """
+    """Represents an immutable structure as a json-encoded string."""
 
     @property
     def python_type(self):
@@ -48,7 +48,7 @@ class User(UserMixin, db.Model):
     experiments = db.relationship('Experiment', backref='author', lazy='dynamic')
 
     def __repr__(self):
-        return f'<User {self.id}, Username {self.username}, Email {self.email}>'
+        return f'<User {self.id}, Username {self.username}, Email {self.email}, Organization {self.organization}'
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -76,7 +76,8 @@ class User(UserMixin, db.Model):
 
     def serialization(self):
         experiment_ids = [exp.id for exp in self.user_experiments()]
-        dictionary = {'Id': self.id, 'UserName': self.username, 'Email': self.email, 'Experiments': experiment_ids}
+        dictionary = {'Id': self.id, 'UserName': self.username, 'Email': self.email, 'Organization': self.organization,
+                      'Experiments': experiment_ids}
         return dictionary
 
 
