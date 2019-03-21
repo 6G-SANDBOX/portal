@@ -85,6 +85,7 @@ The values that can be configured on `config.yml` are:
 * Dispatcher:
     * Host: Location of the machine where the Dispatcher is running (localhost by default).
     * Port: Port where the Dispatcher is listening for connections (5001 by default).
+> The Dispatcher does not currently exist as a separate entity, so this information refers to the ELCM during Release A.
 
 ## Authors
 
