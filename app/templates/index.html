@@ -2,62 +2,34 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block app_content %}
 <head>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('#checkBtn').click(function() {
-              checked = $("input[type=checkbox]:checked").length;
-              if(!checked) {
-                alert("Please, select at least one Test Case");
-                return false;
-              }
-            });
-        });
-    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 
+<a href="/new_experiment" class="btn btn-primary" role="button">Create Experiment</a>
 
-<h3>Create experiments:</h3>
-<form id="form" method="post">
-    {{ form.hidden_tag() }}
-    <h4>Name</h4>
-    <input class="form-control" type="text" name="name" required/>
-    <h4>Type</h4>
-    <select class="form-control" name="type">
-        <option value="Standard" selected>Standard</option>
-        <option value="Custom" disabled>Custom</option>
-    </select>
-    <h4>Test Cases</h4>
-    {% for test_case in test_case_list %}
-    <div class="custom-control custom-checkbox">
-        <input type="checkbox" class="custom-control-input" name="test_cases" value="{{test_case}}"> {{test_case}}</br>
-    </div>
-    {% endfor %}
-     <h4>UEs</h4>
-    {% for ue in ue_list %}
-    <div class="custom-control custom-checkbox">
-        <input type="checkbox" class="custom-control-input" name="ues" value="{{ue}}"> {{ue}}</br>
-    </div>
-    {% endfor %}
-    </br>
-    <button type="submit" id="checkBtn" name="submit" class="btn btn-primary btn-sm">Add Experiment</button>
-</form>
-<hr>
 </br>
-<h3>Experiments:</h3>
+<div style="text-align: center">
+    <h2>EXPERIMENTS</h2>
+</div>
+</br>
 <table class="table table-striped">
     <thead class="thead-dark">
     <tr>
-        <th>Experiment ID</th>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Action</th>
+        <th class="col-md-2">Experiment ID</th>
+        <th class="col-md-5">Name</th>
+        <th class="col-md-2">Type</th>
+        <th class="col-md-3">Action</th>
     </tr>
     </thead>
-    <tbody>
-    {% for experiment in experiments %}
-    {% include '_experiment.html' %}
-    {% endfor %}
-    </tbody>
 </table>
+<div class="table-wrapper-scrollbar custom-scrollbar">
+    <table class="table table-striped">
+        <tbody>
+        {% for experiment in experiments %}
+        {% include '_experiment.html' %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 {% endblock %}

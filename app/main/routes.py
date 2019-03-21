@@ -12,20 +12,6 @@ from Helper import Config
 @bp.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-    list_UEs = list(Config().UEs.keys())
-    form = ExperimentForm()
-    if form.validate_on_submit():
-        test_cases_selected = request.form.getlist('test_cases')
-        ues_selected = request.form.getlist('ues')
-        if not test_cases_selected:
-            flash(f'Please, select at least one Test Case', 'error')
-            return redirect(url_for('main.index'))
-        experiment = Experiment(name=form.name.data, author=current_user, unattended=True, type=form.type.data,
-                                test_cases=test_cases_selected, ues=ues_selected)
-        db.session.add(experiment)
-        db.session.commit()
-        flash('Your experiment has been created', 'info')
-        return redirect(url_for('main.index'))
     experiments = current_user.user_experiments()
     formrun = RunExperimentForm()
     if formrun.validate_on_submit():
@@ -40,9 +26,28 @@ def index():
             db.session.commit()
         except Exception as e:
             flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
-
         return redirect(url_for('main.index'))
-    return render_template('index.html', title='Home', form=form, formRun=formrun, experiments=experiments,
+    return render_template('index.html', title='Home', formRun=formrun, experiments=experiments)
+
+
+@bp.route('/new_experiment', methods=['GET', 'POST'])
+@login_required
+def new_experiment():
+    list_UEs = list(Config().UEs.keys())
+    form = ExperimentForm()
+    if form.validate_on_submit():
+        test_cases_selected = request.form.getlist('test_cases')
+        ues_selected = request.form.getlist('ues')
+        if not test_cases_selected:
+            flash(f'Please, select at least one Test Case', 'error')
+            return redirect(url_for('main.new_experiment'))
+        experiment = Experiment(name=form.name.data, author=current_user, unattended=True, type=form.type.data,
+                                test_cases=test_cases_selected, ues=ues_selected)
+        db.session.add(experiment)
+        db.session.commit()
+        flash('Your experiment has been successfully created', 'info')
+        return redirect(url_for('main.index'))
+    return render_template('new_experiment.html', title='Home', form=form,
                            test_case_list=Config().TestCases, ue_list=list_UEs)
 
 

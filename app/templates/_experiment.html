@@ -10,7 +10,7 @@
     </td>
     <td class="col-md-3">
         <form id="formRun" method="post" novalidate>
-            {{ form.hidden_tag() }}
+            {{ formRun.hidden_tag() }}
             <input type="hidden" name="id" value="{{ experiment.id }}"/>
             <button type="submit" name="submit" class="btn btn-primary btn-sm">Run Experiment</button>
             <a class="btn btn-info btn-sm" href="/experiment/{{ experiment.id }}" role="button">Executions info</a>
