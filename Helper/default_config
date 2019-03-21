@@ -3,7 +3,8 @@ Dispatcher:
   Port: 5001
 
 TestCases:
-  RTT:
+  - RTT
+
 
 UEs:
   TestServer1:

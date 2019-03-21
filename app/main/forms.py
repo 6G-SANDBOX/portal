@@ -10,5 +10,4 @@ class ExperimentForm(FlaskForm):
 
 
 class RunExperimentForm(FlaskForm):
-    id = HiddenField("id")
     submit = SubmitField('Run Experiment')
