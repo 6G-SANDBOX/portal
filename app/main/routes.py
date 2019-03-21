@@ -18,10 +18,10 @@ def index():
         try:
             config = Config()
             api = Dispatcher_Api(config.Dispatcher.Host, config.Dispatcher.Port, "/api/v0")  # //api/v0
-            jsonresponse = api.Post(formrun.id.data)
+            jsonresponse = api.Post(request.form['id'])
             flash(f'Success: {jsonresponse["Success"]} - Execution Id: '
                   f'{jsonresponse["ExecutionId"]} - Message: {jsonresponse["Message"]}', 'info')
-            execution = Execution(id=jsonresponse["ExecutionId"], experiment_id=formrun.id.data, status='Init')
+            execution = Execution(id=jsonresponse["ExecutionId"], experiment_id=request.form['id'], status='Init')
             db.session.add(execution)
             db.session.commit()
         except Exception as e:
