@@ -44,3 +44,7 @@ class Config:
     @property
     def UEs(self):
         return self.data['UEs']
+
+    @property
+    def Platform(self):
+        return self.data['Platform']

@@ -48,7 +48,7 @@ class User(UserMixin, db.Model):
     experiments = db.relationship('Experiment', backref='author', lazy='dynamic')
 
     def __repr__(self):
-        return f'<User {self.id}, Username {self.username}, Email {self.email}, Organization {self.organization}'
+        return f'<User: {self.id}, Username: {self.username}, Email: {self.email}, Organization: {self.organization}'
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -92,8 +92,8 @@ class Experiment(db.Model):
     executions = db.relationship('Execution', backref='experiment', lazy='dynamic')
 
     def __repr__(self):
-        return f'<Experiment {self.id}, Name {self.name}, User_id {self.user_id}, Type {self.type}, ' \
-            f'Unattended {self.unattended}, TestCases {self.test_cases}>'
+        return f'<Experiment: {self.id}, Name: {self.name}, User_id: {self.user_id}, Type: {self.type}, ' \
+            f'Unattended: {self.unattended}, TestCases: {self.test_cases}>'
 
     def experiment_executions(self):
         exp = Execution.query.filter_by(experiment_id=self.id)
@@ -104,12 +104,10 @@ class Experiment(db.Model):
         ueDictionary = {}
         all_UEs = HelperConfig().UEs
         if self.ues:
-            for ue_key, ue_value in all_UEs.items():
-                if ue_key in self.ues:
-                    ueDictionary[ue_key]=ue_value
-
+            for ue in self.ues:
+                if ue in all_UEs.keys(): ueDictionary[ue] = all_UEs[ue]
         dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(),
-                      'Executions': execution_ids, "Platform": Config.PLATFORM,
+                      'Executions': execution_ids, "Platform": HelperConfig().Platform,
                       "TestCases": self.test_cases, "UEs": ueDictionary}
         return dictionary
 

@@ -9,3 +9,7 @@ TestCases:
 UEs:
   TestServer1:
     OS: Linux
+
+
+Platform:
+  Málaga [UMA]

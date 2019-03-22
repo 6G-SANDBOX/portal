@@ -9,5 +9,3 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'localhost'
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or 8025)
-
-    PLATFORM = "Málaga [UMA]"
