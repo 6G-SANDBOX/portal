@@ -86,6 +86,13 @@ The values that can be configured on `config.yml` are:
     * Host: Location of the machine where the Dispatcher is running (localhost by default).
     * Port: Port where the Dispatcher is listening for connections (5001 by default).
 > The Dispatcher does not currently exist as a separate entity, so this information refers to the ELCM during Release A.
+* Platform: Platform name/location.
+* TestCases: List of TestCases supported by the platform.
+* UEs: Dictionary that contains information about the UEs available in the platform. Each element key defines the unique
+ID of the UE, while the value contains a dictionary with extra data about the UE (currently the operating system).
+> The list of TestCases and UEs selected for each experiment will be sent to the Dispatcher (and ELCM) on every 
+execution request. The ELCM uses these values in order to customize the campaign execution (via the Composer and the 
+Facility Registry). This functionality is no yet included in the ELCM (as of 22/03/2019).
 
 ## Authors
 
