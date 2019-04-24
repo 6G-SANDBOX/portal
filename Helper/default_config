@@ -1,0 +1,15 @@
+Dispatcher:
+  Host: '127.0.0.1'
+  Port: 5001
+
+TestCases:
+  - RTT
+
+
+UEs:
+  TestServer1:
+    OS: Linux
+
+
+Platform:
+  Málaga [UMA]

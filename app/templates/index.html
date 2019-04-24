@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block app_content %}
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<a href="/new_experiment" class="btn btn-primary" role="button">Create Experiment</a>
+
+</br>
+<div style="text-align: center">
+    <h2>EXPERIMENTS</h2>
+</div>
+</br>
+<table class="table table-striped">
+    <thead class="thead-dark">
+    <tr>
+        <th class="col-md-2">Experiment ID</th>
+        <th class="col-md-5">Name</th>
+        <th class="col-md-2">Type</th>
+        <th class="col-md-3">Action</th>
+    </tr>
+    </thead>
+</table>
+<div class="table-wrapper-scrollbar custom-scrollbar">
+    <table class="table table-striped">
+        <tbody>
+        {% for experiment in experiments %}
+        {% include '_experiment.html' %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
