@@ -5,7 +5,7 @@ from app import db
 from app.main import bp
 from app.models import Experiment, Execution
 from app.main.forms import ExperimentForm, RunExperimentForm
-from Helper import Config
+from Helper import Config, LogInfo
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -71,7 +71,11 @@ def execution(execution_id):
         api = Dispatcher_Api(config.Dispatcher.Host, config.Dispatcher.Port, "/experiment")
         jsonresponse = api.Get(execution_id)
         status = jsonresponse["Status"]
+        executor = LogInfo(jsonresponse["Executor"])
+        postRun = LogInfo(jsonresponse["PostRun"])
+        preRun = LogInfo(jsonresponse["PreRun"])
 
     except Exception as e:
         flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
-    return render_template('execution.html', title='Execution', execution=exe, log_status=status)
+    return render_template('execution.html', title='Execution', execution=exe, log_status=status, executor=executor
+                           , postRun=postRun, preRun=preRun)

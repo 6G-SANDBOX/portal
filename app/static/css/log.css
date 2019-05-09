@@ -1,0 +1,21 @@
+.logLine {
+    font-family: Consolas;
+    background: black;
+    font-size: small;
+    padding:0;
+    margin:0;
+}
+
+.logDebug { }
+.logInfo { }
+.logWarning { }
+.logError { }
+.logCritical { }
+
+.colorDebug { color: darkgrey; }
+.colorInfo { color: aliceblue; }
+.colorWarning { color: gold; }
+.colorError { color: red; }
+.colorCritical { color: fuchsia; }
+
+.hidden { display: none; }

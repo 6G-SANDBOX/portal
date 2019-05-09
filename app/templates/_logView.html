@@ -1,0 +1,32 @@
+{% set LogLevels = ['Debug', 'Info', 'Warning', 'Error', 'Critical'] %}
+
+{% macro logScripts() %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            {% for level in LogLevels %}
+                $(document).on('click', "#button{{ level }}", function(){
+                    $(".log{{ level }}").toggleClass('hidden')
+                });
+            {% endfor %}
+        });
+    </script>
+{% endmacro %}
+
+{% macro logView(logInfo) %}
+    <div class="container" style="margin: 5px">
+        {% for level in LogLevels %}
+            {% set count = logInfo.Count[level] %}
+            <button id="button{{ level }}" data-toggle="button"
+                    class="btn btn-primary {% if level != 'Debug' %}active{% endif %}"
+                    aria-pressed= {{ "true" if level != 'Debug' else "false"}}>
+                {{ level }}
+                {% if count != 0 %}
+                    <span class="label color{{ level }}" >[{{ count }}]</span>
+                {% endif %}
+            </button>
+        {% endfor %}
+    </div>
+    {% for level, line in logInfo.Log %}
+        <p class="logLine log{{ level }} color{{ level }} {% if level=='Debug' %}hidden{% endif %}">{{ line }}</p>
+    {% endfor %}
+{% endmacro %}
