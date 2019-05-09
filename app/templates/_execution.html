@@ -1,7 +1,7 @@
 <tr>
 
     <th scope="row" class="col-md-2">
-        {{ execution.id }}
+        <a class="" href="/execution/{{ execution.id }}">{{ execution.id }}</a>
     </th>
     <td class="col-md-2">
         {% if execution.status == 'Init' %}

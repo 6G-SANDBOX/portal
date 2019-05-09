@@ -60,3 +60,18 @@ def experiment(experiment_id):
     else:
         executions = exp.experiment_executions()
     return render_template('experiment.html', title='Experiment', experiment=exp, executions=executions)
+
+
+@bp.route('/execution/<execution_id>', methods=['GET', 'POST'])
+@login_required
+def execution(execution_id):
+    exe = Execution.query.get(execution_id)
+    try:
+        config = Config()
+        api = Dispatcher_Api(config.Dispatcher.Host, config.Dispatcher.Port, "/experiment")
+        jsonresponse = api.Get(execution_id)
+        status = jsonresponse["Status"]
+
+    except Exception as e:
+        flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
+    return render_template('execution.html', title='Execution', execution=exe, log_status=status)
