@@ -56,30 +56,48 @@ def new_experiment():
 def experiment(experiment_id):
     exp = Experiment.query.get(experiment_id)
     if exp is None:
-        return render_template('errors/404.html'), 404
+        flash(f'Experiment not found', 'error')
+        return redirect(url_for('main.index'))
     else:
-        executions = exp.experiment_executions()
-    return render_template('experiment.html', title='Experiment', experiment=exp, executions=executions)
+        if exp.user_id is current_user.id:
+            executions = exp.experiment_executions()
+            if executions.count() == 0:
+                flash(f'The experiment {exp.name} doesn\'t have any executions yet', 'info')
+                return redirect(url_for('main.index'))
+            else:
+                return render_template('experiment.html', title='Experiment', experiment=exp, executions=executions)
+        else:
+            flash(f'Forbidden - You don\'t have permission to access this experiment', 'error')
+            return redirect(url_for('main.index'))
 
 
 @bp.route('/execution/<execution_id>', methods=['GET', 'POST'])
 @login_required
 def execution(execution_id):
     exe = Execution.query.get(execution_id)
-    try:
-        config = Config()
-        api = Dispatcher_Api(config.Dispatcher.Host, config.Dispatcher.Port, "/experiment")
-        jsonresponse = api.Get(execution_id)
-        status = jsonresponse["Status"]
-        if status == 'Not Found':
-            flash(f'Execution not found', 'error')
-            return redirect(url_for('main.index'))
+    if exe is None:
+        flash(f'Execution not found', 'error')
+        return redirect(url_for('main.index'))
+    else:
+        exp = Experiment.query.get(exe.experiment_id)
+        if exp.user_id is current_user.id:
+            try:
+                config = Config()
+                api = Dispatcher_Api(config.Dispatcher.Host, config.Dispatcher.Port, "/experiment")
+                jsonresponse = api.Get(execution_id)
+                status = jsonresponse["Status"]
+                if status == 'Not Found':
+                    flash(f'Execution not found', 'error')
+                    return redirect(url_for('main.index'))
+                else:
+                    executor = LogInfo(jsonresponse["Executor"])
+                    postRun = LogInfo(jsonresponse["PostRun"])
+                    preRun = LogInfo(jsonresponse["PreRun"])
+                    return render_template('execution.html', title='Execution', execution=exe, log_status=status,
+                                           executor=executor, postRun=postRun, preRun=preRun)
+            except Exception as e:
+                flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
         else:
-            executor = LogInfo(jsonresponse["Executor"])
-            postRun = LogInfo(jsonresponse["PostRun"])
-            preRun = LogInfo(jsonresponse["PreRun"])
-            return render_template('execution.html', title='Execution', execution=exe, log_status=status,
-                                   executor=executor, postRun=postRun, preRun=preRun)
-    except Exception as e:
-        flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
+            flash(f'Forbidden - You don\'t have permission to access this execution', 'error')
+            return redirect(url_for('main.index'))
 
