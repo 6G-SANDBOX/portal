@@ -3,61 +3,67 @@
 {% import '_logView.html' as logView %}
 
 {% block styles %}
-    {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/log.css') }}">
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/log.css') }}">
 {% endblock %}
 
-{% macro executorTimes(name, executor) %}
-<div class="container">
-    <h3>{{ name }}</h3>
-</div>
-{% endmacro %}
-
+{% block scripts %}
+{{ super() }}
+{{ logView.logScripts() }}
+{% endblock %}
 
 {% macro accordionCard(accordion, card, logInfo) %}
 {% set LogLevels = ['Debug', 'Info', 'Warning', 'Error', 'Critical'] %}
 <div class="card">
-    <div class="card-header" id="{{ card }}Header">
-        <button class="btn btn-block" type="button" data-toggle="collapse"
-                data-target="#{{ card }}Log" aria-expanded="false" aria-controls="{{ card }}Log">
-            {{ card }} Log
-            {% for level in LogLevels %}
-                {% set count = logInfo.Count[level] %}
-            {% endfor %}
-        </button>
-    </div>
-    <div id="{{ card }}Log" class="collapse" aria-labelledby="{{ card }}Header" data-parent="#{{ accordion }}">
-        <div class="card-body">
-            {{ logView.logView(logInfo) }}
-        </div>
+    <div class = "panel panel-info">
+        {{ logView.logView(card, logInfo) }}
     </div>
 </div>
 {% endmacro %}
 
-
-
 {% block app_content %}
-<h3>Execution {{ execution.id }}:</h3>
+<h3>Execution {{ execution.id }}</h3>
+</br>
+<table class="table">
+    <thead class="thead-dark">
+    <tr>
+        <th>Status</th>
+        <th>Start Time</th>
+        <th>End Time</th>
+        <th>Experiment</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="col-md-1">
+            {% if execution.status == 'Init' %}
+            <span class="label label-default">{{ execution.status }}</span>
+            {% elif execution.status in ['PreRun', 'Run', 'PostRun'] %}
+            <span class="label label-primary">{{ execution.status }}</span>
+            {% elif execution.status == 'Finished' %}
+            <span class="label label-success">{{ execution.status }}</span>
+            {% elif execution.status == 'Cancelled' %}
+            <span class="label label-warning">{{ execution.status }}</span>
+            {% elif execution.status == 'Errored' %}
+            <span class="label label-danger">{{ execution.status }}</span>
+            {% endif %}        </td>
+        </td>
+        <td class="col-md-4">
+            {{ execution.start_time }}
+        </td>
+        <td class="col-md-4">
+            {{ execution.end_time }}
+        </td>
+        <td class="col-md-1">
+            {{ execution.experiment_id }}
+        </td>
+    </tr>
+    </tbody>
+</table>
 <hr>
 </br>
-<b>Experiment: </b>{{ execution.experiment_id }}</br>
-<b>Status: </b>{{ execution.status }}</br>
-<b>Start Time: </b>{{ execution.start_time }}</br>
-<b>End Time: </b>{{ execution.end_time }}</br>
-</br>
-</br>
+{{ accordionCard('logAccordion', 'Pre-Run', preRun) }}
+{{ accordionCard('logAccordion', 'Run', executor) }}
+{{ accordionCard('logAccordion', 'Post-Run', postRun) }}
 
-    <div class="container">
-        Status: <span class="badge">{{ execution.status }}</span>
-        Created: {{ execution.start_time }}
-    </div>
-
-    <div class="accordion" id="logAccordion">
-      {{ executorTimes('Pre-Run', preRun) }}
-      {{ accordionCard('logAccordion', 'Pre-Run', preRun) }}
-      {{ executorTimes('Run', executor) }}
-      {{ accordionCard('logAccordion', 'Run', executor) }}
-      {{ executorTimes('Post-Run', postRun) }}
-      {{ accordionCard('logAccordion', 'Post-Run', postRun) }}
-    </div>
 {% endblock %}

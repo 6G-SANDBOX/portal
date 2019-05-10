@@ -71,11 +71,15 @@ def execution(execution_id):
         api = Dispatcher_Api(config.Dispatcher.Host, config.Dispatcher.Port, "/experiment")
         jsonresponse = api.Get(execution_id)
         status = jsonresponse["Status"]
-        executor = LogInfo(jsonresponse["Executor"])
-        postRun = LogInfo(jsonresponse["PostRun"])
-        preRun = LogInfo(jsonresponse["PreRun"])
-
+        if status == 'Not Found':
+            flash(f'Execution not found', 'error')
+            return redirect(url_for('main.index'))
+        else:
+            executor = LogInfo(jsonresponse["Executor"])
+            postRun = LogInfo(jsonresponse["PostRun"])
+            preRun = LogInfo(jsonresponse["PreRun"])
+            return render_template('execution.html', title='Execution', execution=exe, log_status=status,
+                                   executor=executor, postRun=postRun, preRun=preRun)
     except Exception as e:
         flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
-    return render_template('execution.html', title='Execution', execution=exe, log_status=status, executor=executor
-                           , postRun=postRun, preRun=preRun)
+
