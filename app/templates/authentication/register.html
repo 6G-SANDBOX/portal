@@ -1,7 +1,20 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
-
 {% block app_content %}
+
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+{% block scripts %}
+<script>
+(function() {
+    document.getElementById('navbar-register').classList.add('menuSelected');
+    document.getElementById('navbar-login').classList.remove('menuSelected');
+})();
+</script>
+{% endblock %}
+
 <h1>Register</h1>
 <div class="row">
     <div class="col-md-4">

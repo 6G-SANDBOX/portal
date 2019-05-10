@@ -7,3 +7,8 @@
 .table-wrapper-scrollbar{
     display: block;
 }
+
+.menuSelected{
+    color: #0074d9 !important;
+    font-weight: bold !important;
+}

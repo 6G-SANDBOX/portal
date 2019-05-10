@@ -1,7 +1,7 @@
 <tr>
 
     <th scope="row" class="col-md-2">
-        <a class="" href="/execution/{{ execution.id }}">{{ execution.id }}</a>
+       {{ execution.id }}
     </th>
     <td class="col-md-2">
         {% if execution.status == 'Init' %}
@@ -17,10 +17,13 @@
         {% endif %}
 
     </td>
-    <td class="col-md-4">
+    <td class="col-md-3">
         {{ execution.start_time }}
     </td>
-    <td class="col-md-4">
+    <td class="col-md-3">
         {{ execution.end_time }}
+    </td>
+    <td class="col-md-2">
+        <a class="btn btn-primary btn-sm" href="/execution/{{ execution.id }}" role="button">Execution Logs</a>
     </td>
 </tr>

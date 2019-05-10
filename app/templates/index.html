@@ -1,13 +1,20 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block app_content %}
+
 <head>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 
-<a href="/new_experiment" class="btn btn-primary" role="button">Create Experiment</a>
+{% block scripts %}
+<script>
+(function() {
+    document.getElementById('navbar-home').classList.add('menuSelected');
+    document.getElementById('navbar-createExperiment').classList.remove('menuSelected');
+})();
+</script>
+{% endblock %}
 
-</br>
 <div style="text-align: center">
     <h2>EXPERIMENTS</h2>
 </div>

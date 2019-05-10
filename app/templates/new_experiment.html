@@ -15,9 +15,22 @@
             });
         });
     </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 
-<h3>Create experiments:</h3>
+{% block scripts %}
+<script>
+(function() {
+    document.getElementById('navbar-createExperiment').classList.add('menuSelected');
+    document.getElementById('navbar-home').classList.remove('menuSelected');
+})();
+</script>
+{% endblock %}
+
+<div style="text-align: center">
+    <h2>CREATE EXPERIMENT</h2>
+</div>
+</br>
 <form id="form" method="post">
     {{ form.hidden_tag() }}
     <h4>Name</h4>
@@ -42,7 +55,5 @@
     </br>
     <button type="submit" id="checkBtn" name="submit" class="btn btn-primary">Add Experiment</button>
 </form>
-</br>
-</br>
-<a href="/index" class="btn btn-primary" role="button">Back</a>
+
 {% endblock %}

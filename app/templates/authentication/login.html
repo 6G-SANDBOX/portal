@@ -2,6 +2,20 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='./css/main.css') }}">
+</head>
+
+{% block scripts %}
+<script>
+(function() {
+    document.getElementById('navbar-login').classList.add('menuSelected');
+    document.getElementById('navbar-register').classList.remove('menuSelected');
+})();
+</script>
+{% endblock %}
+
+
 <h1>Sign In</h1>
 <div class="row">
     <div class="col-md-4">
@@ -9,7 +23,6 @@
     </div>
 </div>
 <br>
-<p><a href="{{ url_for('authentication.register') }}">Register</a></p>
 <p>
     Forgot Your Password?
     <a href="{{ url_for('authentication.reset_password_request') }}">Click to Reset It</a>

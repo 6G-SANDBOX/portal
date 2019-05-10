@@ -1,7 +1,8 @@
 {% extends 'bootstrap/base.html' %}
+
 <html>
 {% block title %}
-Welcome to 5GENESIS
+5GENESIS Portal
 {% endblock %}
 
 {% block navbar %}
@@ -15,19 +16,28 @@ Welcome to 5GENESIS
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
+            {% if current_user.is_anonymous %}
+            <a class="navbar-brand" href="{{ url_for('authentication.login') }}">5Genesis</a>
+            {% else %}
             <a class="navbar-brand" href="{{ url_for('main.index') }}">5Genesis</a>
+            {% endif %}
         </div>
+
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            {% if current_user.is_anonymous %}
             <ul class="nav navbar-nav">
-                <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li><a id="navbar-login" href="{{ url_for('authentication.login') }}">Login</a></li>
+                <li><a id="navbar-register" href="{{ url_for('authentication.register') }}">Register</a></li>
+            </ul>
+            {% else %}
+            <ul class="nav navbar-nav">
+                <li><a id="navbar-home" href="{{ url_for('main.index') }}">Home</a></li>
+                <li><a id="navbar-createExperiment" href="{{ url_for('main.new_experiment') }}">Create Experiment</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                {% if current_user.is_anonymous %}
-                <li><a href="{{ url_for('authentication.login') }}">Login</a></li>
-                {% else %}
                 <li><a href="{{ url_for('authentication.logout') }}">{{ current_user.username }} - Logout</a></li>
-                {% endif %}
             </ul>
+            {% endif %}
         </div>
     </div>
 </nav>
