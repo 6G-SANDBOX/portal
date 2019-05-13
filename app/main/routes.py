@@ -71,7 +71,7 @@ def experiment(experiment_id):
             return redirect(url_for('main.index'))
 
 
-@bp.route('/execution/<execution_id>', methods=['GET', 'POST'])
+@bp.route('/execution/<execution_id>', methods=['GET'])
 @login_required
 def execution(execution_id):
     exe = Execution.query.get(execution_id)
