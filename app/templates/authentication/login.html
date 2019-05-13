@@ -2,9 +2,6 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-<head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='./css/main.css') }}">
-</head>
 
 {% block scripts %}
 <script>
@@ -15,16 +12,26 @@
 </script>
 {% endblock %}
 
-
-<h1>Sign In</h1>
 <div class="row">
-    <div class="col-md-4">
-        {{ wtf.quick_form(form) }}
+    <div class="col-sm-6">
+        <h1>Sign In</h1>
+        <div class="row">
+            <div class="col-md-8">
+                {{ wtf.quick_form(form) }}
+            </div>
+        </div>
+        <br>
+        <p>
+            Forgot Your Password?
+            <a href="{{ url_for('authentication.reset_password_request') }}">Click to Reset It</a>
+        </p>
+    </div>
+    <div class="col-sm-6" style="text-align: center; padding-top: 20px">
+        <div style="margin:0 auto;">
+            <img src="../static/images/5genesis_transparent.png" alt="5Genesis">
+            <br>
+            <h2>{{ description }}</h2>
+        </div>
     </div>
 </div>
-<br>
-<p>
-    Forgot Your Password?
-    <a href="{{ url_for('authentication.reset_password_request') }}">Click to Reset It</a>
-</p>
 {% endblock %}
