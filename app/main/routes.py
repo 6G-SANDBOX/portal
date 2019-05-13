@@ -13,10 +13,12 @@ from Helper import Config, LogInfo
 @login_required
 def index():
     experiments = current_user.user_experiments()
-    formrun = RunExperimentForm()
-    if formrun.validate_on_submit():
+    formRun = RunExperimentForm()
+    config = Config()
+    notices = config.Notices
+    if formRun.validate_on_submit():
         try:
-            config = Config()
+
             api = Dispatcher_Api(config.Dispatcher.Host, config.Dispatcher.Port, "/api/v0")  # //api/v0
             jsonresponse = api.Post(request.form['id'])
             flash(f'Success: {jsonresponse["Success"]} - Execution Id: '
@@ -27,7 +29,7 @@ def index():
         except Exception as e:
             flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
         return redirect(url_for('main.index'))
-    return render_template('index.html', title='Home', formRun=formrun, experiments=experiments)
+    return render_template('index.html', title='Home', formRun=formRun, experiments=experiments, notices=notices)
 
 
 @bp.route('/new_experiment', methods=['GET', 'POST'])

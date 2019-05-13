@@ -19,7 +19,7 @@ class Dispatcher:
 
 class Config:
     FILENAME = 'config.yml'
-
+    FILENAME_NOTICES = 'notices.yml'
     data = None
 
     def __init__(self):
@@ -32,6 +32,15 @@ class Config:
 
         with open(self.FILENAME, 'r', encoding='utf-8') as file:
             self.data = yaml.safe_load(file)
+
+    @property
+    def Notices(self):
+        if not exists(self.FILENAME_NOTICES):
+            return []
+
+        with open(self.FILENAME_NOTICES, 'r', encoding='utf-8') as file:
+            notices = yaml.safe_load(file)
+            return notices['Notices']
 
     @property
     def Dispatcher(self):
@@ -52,3 +61,4 @@ class Config:
     @property
     def Description(self):
         return self.data['Description']
+
