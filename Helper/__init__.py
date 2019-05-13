@@ -1,2 +1,2 @@
 from .config import Config
-from .log import LogInfo
+from .log_info import LogInfo
