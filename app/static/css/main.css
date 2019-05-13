@@ -2,13 +2,76 @@
     position: relative;
     height: 500px;
     overflow: auto;
+    scrollbar-color: #a1daf8 #e7f6fd;
 }
 
-.table-wrapper-scrollbar{
+.div-wrapper-scrollbar{
     display: block;
 }
 
 .menuSelected{
-    color: #0074d9 !important;
+    color: #0089d2 !important;
     font-weight: bold !important;
+}
+
+.navbar-brand{
+    color: #005b90 !important;
+}
+
+h1, h2, h3{
+    color: #005b90;
+}
+
+h4{
+    color: #777777;
+}
+
+form > h4{
+    color: #005b90 !important;
+}
+
+li > a:hover{
+    color: #005b90 !important;
+}
+
+.btn-darkBlue {
+    color: #ffffff;
+    background-color: #005b90;
+    border-color: #00304d;
+}
+
+.btn-darkBlue.active, .btn-darkBlue:hover {
+    background-color: #0089d2;
+}
+
+.btn-blue {
+    color: #ffffff;
+    background-color: #0089d2;
+    border-color: #005b90;
+}
+
+.btn-lightBlue {
+    color: #ffffff;
+    background-color: #a1daf8;
+    border-color: #0089d2;
+}
+
+.btn-darkBlue.focus, .btn-blue.focus, .btn-lightBlue.focus{
+    color: #ffffff;
+}
+
+th, td{
+    vertical-align: middle !important;
+}
+
+.thead-dark{
+    color: #005b90 !important;
+}
+
+.table-header th {
+   border-bottom: 2px solid #005b90 !important;
+}
+
+.table {
+    margin-bottom: 0px !important;
 }

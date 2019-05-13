@@ -2,9 +2,9 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block app_content %}
 
-<head>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-    <script type="text/javascript">
+{% block scripts %}
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<script type="text/javascript">
         $(document).ready(function () {
             $('#checkBtn').click(function() {
               checked = $("input[name=test_cases]:checked").length;
@@ -14,11 +14,7 @@
               }
             });
         });
-    </script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-</head>
-
-{% block scripts %}
+</script>
 <script>
 (function() {
     document.getElementById('navbar-createExperiment').classList.add('menuSelected');
@@ -27,10 +23,13 @@
 </script>
 {% endblock %}
 
+
 <div style="text-align: center">
     <h2>CREATE EXPERIMENT</h2>
 </div>
 </br>
+<div class="col-sm-3" ></div>
+<div class="col-sm-6" >
 <form id="form" method="post">
     {{ form.hidden_tag() }}
     <h4>Name</h4>
@@ -53,7 +52,8 @@
     </div>
     {% endfor %}
     </br>
-    <button type="submit" id="checkBtn" name="submit" class="btn btn-primary">Add Experiment</button>
+    <button type="submit" id="checkBtn" name="submit" class="btn btn-darkBlue">Add Experiment</button>
 </form>
-
+</div>
+<div class="col-sm-3" ></div>
 {% endblock %}

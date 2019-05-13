@@ -21,7 +21,7 @@
         {% for level in LogLevels %}
         {% set count = logInfo.Count[level] %}
         <button id="button{{ level }}" data-toggle="button"
-                class="btn btn-primary btn{{ level }} {% if level != 'Debug' %}active{% endif %}"
+                class="btn btn-darkBlue btn{{ level }} {% if level != 'Debug' %}active{% endif %}"
                 aria-pressed= {{ "true" if level != 'Debug' else "false"}} >
         {{ level }}
         {% if count != 0 %}

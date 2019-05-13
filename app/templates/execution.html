@@ -22,9 +22,11 @@
 {% endmacro %}
 
 {% block app_content %}
-<h3>Execution {{ execution.id }}</h3>
+<div style="text-align: center">
+    <h2>Execution {{ execution.id }}</h2>
+</div>
 </br>
-<table class="table">
+<table class="table table-header">
     <thead class="thead-dark">
     <tr>
         <th>Status</th>
@@ -62,6 +64,7 @@
 </table>
 <hr>
 </br>
+
 {{ accordionCard('logAccordion', 'Pre-Run', preRun) }}
 {{ accordionCard('logAccordion', 'Run', executor) }}
 {{ accordionCard('logAccordion', 'Post-Run', postRun) }}
