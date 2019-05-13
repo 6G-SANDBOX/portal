@@ -1,7 +1,6 @@
 <tr>
-
     <th scope="row" class="col-md-2">
-       {{ execution.id }}
+        {{ execution.id }}
     </th>
     <td class="col-md-2">
         {% if execution.status == 'Init' %}
@@ -15,7 +14,6 @@
         {% elif execution.status == 'Errored' %}
         <span class="label label-danger">{{ execution.status }}</span>
         {% endif %}
-
     </td>
     <td class="col-md-3">
         {{ execution.start_time }}

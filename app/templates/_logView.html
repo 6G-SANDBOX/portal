@@ -31,7 +31,9 @@
         {% endfor %}
     </div>
 </div>
+
 {% for level, line in logInfo.Log %}
 <p style="padding-left: 10px" class="logLine log{{ level }} color{{ level }} {% if level=='Debug' %}hidden{% endif %}">{{ line }}</p>
 {% endfor %}
+
 {% endmacro %}

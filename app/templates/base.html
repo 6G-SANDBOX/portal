@@ -12,7 +12,6 @@
 
 {% block navbar %}
 <nav class="navbar navbar-default">
-
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
@@ -29,9 +28,7 @@
             <a href="{{ url_for('main.index') }}"><img src="../static/images/5genesis_transparent.png" alt="5Genesis" height="50" width="39" style="float: left; padding: 5px"></a>
             <a class="navbar-brand" href="{{ url_for('main.index') }}">5Genesis</a>
             {% endif %}
-
         </div>
-
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             {% if current_user.is_anonymous %}
             <ul class="nav navbar-nav">
