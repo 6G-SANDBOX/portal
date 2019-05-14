@@ -45,6 +45,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     organization = db.Column(db.String(32))
     experiments = db.relationship('Experiment', backref='author', lazy='dynamic')
+    actions = db.relationship('Action', backref='author', lazy='dynamic')
 
     def __repr__(self):
         return f'<User: {self.id}, Username: {self.username}, Email: {self.email}, Organization: {self.organization}'
@@ -63,6 +64,10 @@ class User(UserMixin, db.Model):
     def user_experiments(self):
         exp = Experiment.query.filter_by(user_id=self.id)
         return exp.order_by(Experiment.id.desc())
+
+    def user_actions(self):
+        acts = Action.query.filter_by(user_id=self.id).order_by(Action.id.desc()).limit(10)
+        return acts
 
     @staticmethod
     def verify_reset_password_token(token):
@@ -121,3 +126,14 @@ class Execution(db.Model):
     def __repr__(self):
         return f'<Execution {self.id}, Experiment_id {self.experiment_id}, Start_time {self.start_time}, ' \
             f'End_time {self.end_time}, Status {self.status}>'
+
+
+class Action(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DATETIME)
+    message = db.Column(db.String(256))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    def __repr__(self):
+        return f'<Action {self.id}, Timestamp {self.timestamp}, Message {self.message}, ' \
+            f'User {self.user_id}>'
