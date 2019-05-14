@@ -39,12 +39,11 @@
     </div>
 </div>
 
-<div class="col-md-3" style="border: 2px solid #a1daf8">
-    <div style="text-align: center;" >
+<div class="col-md-3">
+    {% if notices %}
+    <div style="text-align: center; border: 2px solid #a1daf8; margin-bottom: 25px" >
         <h2>NOTICES</h2>
-        </br>
-        </br>
-        <table class="table table-striped" style="margin-top: 15px;">
+        <table class="table table-striped" style="margin-top: 15px">
             <tbody>
             {% for notice in notices %}
             {% include '_notices.html' %}
@@ -52,5 +51,20 @@
             </tbody>
         </table>
     </div>
+    {% endif %}
+    {% if actions %}
+    <div style="text-align: center; border: 2px solid #a1daf8" >
+        <h2>ACTIONS</h2>
+        <div class="div-wrapper-scrollbar actions-scrollbar">
+            <table class="table table-striped">
+                <tbody>
+                {% for action in actions %}
+                {% include '_actions.html' %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
