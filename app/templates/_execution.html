@@ -16,10 +16,10 @@
         {% endif %}
     </td>
     <td class="col-md-3">
-        {{ execution.start_time }}
+        {{ moment(execution.start_time).format('DD MMMM YYYY, h:mm:ss') }}
     </td>
     <td class="col-md-3">
-        {{ execution.end_time }}
+        {{ moment(execution.end_time).format('DD MMMM YYYY, h:mm:ss') }}
     </td>
     <td class="col-md-2">
         <a class="btn btn-darkBlue btn-sm" href="/execution/{{ execution.id }}" role="button">Execution Logs</a>

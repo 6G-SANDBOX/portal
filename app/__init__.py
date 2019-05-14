@@ -6,6 +6,7 @@ from flask_bootstrap import Bootstrap
 from flask_mail import Mail
 from logging.handlers import RotatingFileHandler
 from config import Config
+from flask_moment import Moment
 import os
 import logging
 
@@ -16,6 +17,7 @@ login.login_view = 'authentication.login'
 login.login_message = 'Please log in to access this page.'
 bootstrap = Bootstrap()
 mail = Mail()
+moment = Moment()
 
 
 def create_app(config_class=Config):
@@ -27,6 +29,7 @@ def create_app(config_class=Config):
     login.init_app(app)
     bootstrap.init_app(app)
     mail.init_app(app)
+    moment.init_app(app)
 
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)

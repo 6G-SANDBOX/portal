@@ -10,6 +10,8 @@
 {% block scripts %}
 {{ super() }}
 {{ logView.logScripts() }}
+{{ moment.include_jquery() }}
+{{ moment.include_moment() }}
 {% endblock %}
 
 {% macro accordionCard(accordion, card, logInfo) %}
@@ -37,7 +39,7 @@
     </thead>
     <tbody>
     <tr>
-        <td class="col-md-1">
+        <td>
             {% if execution.status == 'Init' %}
             <span class="label label-default">{{ execution.status }}</span>
             {% elif execution.status in ['PreRun', 'Run', 'PostRun'] %}
@@ -50,13 +52,13 @@
             <span class="label label-danger">{{ execution.status }}</span>
             {% endif %}        </td>
         </td>
-        <td class="col-md-4">
-            {{ execution.start_time }}
+        <td>
+            {{ moment(execution.start_time).format('DD MMMM YYYY, h:mm:ss') }}
         </td>
-        <td class="col-md-4">
-            {{ execution.end_time }}
+        <td>
+            {{ moment(execution.end_time).format('DD MMMM YYYY, h:mm:ss') }}
         </td>
-        <td class="col-md-1">
+        <td>
             {{ execution.experiment_id }}
         </td>
     </tr>
