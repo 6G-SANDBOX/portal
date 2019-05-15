@@ -68,6 +68,10 @@ li > a:hover{
     color: #ffffff;
 }
 
+.btn-panel {
+    background-color: #d9edf7;
+}
+
 th, td{
     vertical-align: middle !important;
 }
@@ -78,6 +82,14 @@ th, td{
 
 .table-header th {
    border-bottom: 2px solid #005b90 !important;
+}
+
+.table-header-right th {
+   border-right: 2px solid #005b90 !important;
+}
+
+.table-cell-divisor-right {
+    border-right: 1px solid #ddd;
 }
 
 .table {

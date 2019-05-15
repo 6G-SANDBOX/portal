@@ -14,16 +14,20 @@
 
 {% macro accordionCard(accordion, card, VNFInfo) %}
 <div class="card">
-    <div class="card-header" id="{{ card }}Header">
-        <button class="btn btn-block" type="button" data-toggle="collapse"
+    <div class = "panel panel-info">
+    <div class="panel-heading" id="{{ card }}Header" style="padding: 0px !important">
+        <h2 class = "panel-title" >
+            <button class="btn btn-block btn-panel" type="button" data-toggle="collapse"
                 data-target="#{{ card }}_VNF" aria-expanded="false" aria-controls="{{ card }}_VNF">
-            VNF: {{ card }}
+                <b>VNF:</b> {{ VNFInfo.name }}
         </button>
+        </h2>
     </div>
     <div id="{{ card }}_VNF" class="collapse" aria-labelledby="{{ card }}Header" data-parent="#{{ accordion }}">
         <div class="card-body">
             {% include '_VNF.html' %}
         </div>
+    </div>
     </div>
 </div>
 {% endmacro %}
@@ -32,10 +36,12 @@
 <div style="text-align: center">
     <h2>VNF REPOSITORY</h2>
 </div>
+<a class="btn btn-blue" href="{{ url_for('main.upload_VNF') }}" role="button">Upload VNF</a>
+</br>
 </br>
 <div class="accordion" id="VNFAccordion">
     {% for VNF in VNFs %}
-    {{ accordionCard('VNFAccordion', 'VNF'+(VNF.id|string), VNF) }}
+    {{ accordionCard('VNFAccordion', VNF.name.replace(' ',''), VNF) }}
     {% endfor %}
 </div>
 {% endblock %}
