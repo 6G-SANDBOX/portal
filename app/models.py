@@ -70,6 +70,10 @@ class User(UserMixin, db.Model):
         acts = Action.query.filter_by(user_id=self.id).order_by(Action.id.desc()).limit(10)
         return acts
 
+    def user_VNFs(self):
+        VNFs = VNF.query.filter_by(user_id=self.id).order_by(VNF.id)
+        return VNFs
+
     @staticmethod
     def verify_reset_password_token(token):
         try:

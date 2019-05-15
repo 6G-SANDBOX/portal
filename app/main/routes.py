@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 from REST import Dispatcher_Api
 from app import db
 from app.main import bp
-from app.models import User, Experiment, Execution, Action
+from app.models import User, Experiment, Execution, Action, VNF
 from app.main.forms import ExperimentForm, RunExperimentForm
 from Helper import Config, LogInfo
 from datetime import datetime
@@ -114,3 +114,9 @@ def execution(execution_id):
             flash(f'Forbidden - You don\'t have permission to access this execution', 'error')
             return redirect(url_for('main.index'))
 
+
+@bp.route('/vnf_repository', methods=['GET', 'POST'])
+@login_required
+def vnf_repository():
+    VNFs = current_user.user_VNFs()
+    return render_template('vnf_repository.html', title='Home', VNFs=VNFs)
