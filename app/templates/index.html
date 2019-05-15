@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 
-{% block app_content %}
-
 {% block scripts %}
 {{ super() }}
 <script>
@@ -14,7 +12,7 @@
 </script>
 {% endblock %}
 
-
+{% block app_content %}
 <div class="col-md-9" style="padding-right: 25px">
     <div style="text-align: center">
         <h2>EXPERIMENTS</h2>
