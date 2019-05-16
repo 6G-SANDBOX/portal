@@ -57,6 +57,9 @@ li > a:hover{
     background-color: #0089d2;
     border-color: #005b90;
 }
+.btn-blue.active, .btn-blue:hover {
+    background-color: #00a6ff;
+}
 
 .btn-lightBlue {
     color: #ffffff;

@@ -1,0 +1,44 @@
+.js .input-file-trigger1, .js .input-file-trigger2, .js .input-file-trigger3, .js .input-file-trigger4 {
+  padding: 6px 12px;
+  border-radius: 4px;
+  background: #0089d2;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 400;
+  border: 1px solid transparent;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.js .input-file1, .js .input-file2, .js .input-file3, .js .input-file4 {
+  position: absolute;
+  top: 0; left: 0;
+  width: 225px;
+  opacity: 0;
+  padding: 14px 0;
+  cursor: pointer;
+}
+.js .input-file1:hover + .input-file-trigger1, .js .input-file1:focus + .input-file-trigger1,
+.js .input-file-trigger1:hover, .js .input-file-trigger1:focus,
+.js .input-file2:hover + .input-file-trigger2, .js .input-file2:focus + .input-file-trigger2,
+.js .input-file-trigger2:hover, .js .input-file-trigger2:focus,
+.js .input-file3:hover + .input-file-trigger3, .js .input-file3:focus + .input-file-trigger3,
+.js .input-file-trigger3:hover, .js .input-file-trigger3:focus,
+.js .input-file4:hover + .input-file-trigger4, .js .input-file4:focus + .input-file-trigger4,
+.js .input-file-trigger4:hover, .js .input-file-trigger4:focus{
+  background: #00a6ff;
+}
+
+.file-return1, .file-return2, .file-return3, .file-return4 {
+  margin-left: 10px;
+}
+
+.js .file-return1, .js .file-return2, .js .file-return3, .js .file-return4 {
+  font-weight: bold;
+  color: #005b90;
+}
+.js .file-return1:not(:empty):before, .js .file-return2:not(:empty):before,
+.js .file-return3:not(:empty):before, .js .file-return4:not(:empty):before {
+  content: "Selected: ";
+  font-style: normal;
+  font-weight: normal;
+}
