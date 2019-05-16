@@ -4,9 +4,12 @@ from REST import Dispatcher_Api
 from app import db
 from app.main import bp
 from app.models import User, Experiment, Execution, Action, VNF
-from app.main.forms import ExperimentForm, RunExperimentForm
+from app.main.forms import ExperimentForm, RunExperimentForm, VNFForm
 from Helper import Config, LogInfo
 from datetime import datetime
+from werkzeug.utils import secure_filename
+import os
+from config import Config as UploaderConfig
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -120,3 +123,57 @@ def execution(execution_id):
 def vnf_repository():
     VNFs = current_user.user_VNFs()
     return render_template('vnf_repository.html', title='Home', VNFs=VNFs)
+
+
+@bp.route('/upload_VNF', methods=['GET', 'POST'])
+@login_required
+def upload_VNF():
+    form = VNFForm()
+    if form.validate_on_submit():
+        if 'fileVNFD' not in request.files or 'fileNDS' not in request.files or 'fileImage' not in request.files:
+            flash('There are files missing', 'error')
+            return redirect(request.url)
+
+        fileVNFD = request.files['fileVNFD']
+        fileNDS = request.files['fileNDS']
+        fileImage = request.files['fileImage']
+        fileNST = ""
+        try:
+            fileNST = request.files['fileNST']
+        except Exception as e:
+            pass
+        print("ey")
+
+        if fileVNFD.filename == '' or fileNDS.filename == '' or fileImage.filename == '':
+            flash('There are files missing', 'error')
+            return redirect(request.url)
+
+        if fileVNFD and fileNDS and fileImage:
+            fileVNFD_name = secure_filename(fileVNFD.filename)
+            fileNDS_name = secure_filename(fileNDS.filename)
+            fileImage_name = secure_filename(fileImage.filename)
+            if fileNST != '':
+                fileNST_name = secure_filename(fileNST.filename)
+            else:
+                fileNST_name = ""
+
+            new_VNF = VNF(name=form.name.data, author=current_user, description=form.description.data,
+                          VNFD=fileVNFD_name, NDS=fileNDS_name, image=fileImage_name, NST=fileNST_name)
+            db.session.add(new_VNF)
+            db.session.commit()
+
+            os.makedirs(UploaderConfig.UPLOAD_FOLDER+'/vnfs/'+str(new_VNF.id)+"/vnfd", mode=0o755, exist_ok=True)
+            os.makedirs(UploaderConfig.UPLOAD_FOLDER+'/vnfs/'+str(new_VNF.id)+"/nds", mode=0o755, exist_ok=True)
+            os.makedirs(UploaderConfig.UPLOAD_FOLDER+'/vnfs/'+str(new_VNF.id)+"/images", mode=0o755, exist_ok=True)
+            os.makedirs(UploaderConfig.UPLOAD_FOLDER+'/vnfs/'+str(new_VNF.id)+"/nst", mode=0o755, exist_ok=True)
+
+            fileVNFD.save(os.path.join(UploaderConfig.UPLOAD_FOLDER, "vnfs", str(new_VNF.id), "vnfd", fileVNFD_name))
+            fileVNFD.save(os.path.join(UploaderConfig.UPLOAD_FOLDER, "vnfs", str(new_VNF.id), "nds", fileNDS_name))
+            fileVNFD.save(os.path.join(UploaderConfig.UPLOAD_FOLDER, "vnfs", str(new_VNF.id), "images", fileImage_name))
+            if fileNST_name != '':
+                fileVNFD.save(os.path.join(UploaderConfig.UPLOAD_FOLDER, "vnfs", str(new_VNF.id), "nst", fileNST_name))
+
+            flash('Your VNF has been successfully uploaded', 'info')
+            return redirect(url_for('main.vnf_repository'))
+        flash('There are files missing', 'error')
+    return render_template('upload_VNF.html', title='Home', form=form)

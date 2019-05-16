@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, HiddenField, SelectField
+from wtforms import StringField, SubmitField, SelectField, TextAreaField
 from wtforms.validators import DataRequired
 
 
@@ -11,3 +11,9 @@ class ExperimentForm(FlaskForm):
 
 class RunExperimentForm(FlaskForm):
     submit = SubmitField('Run Experiment')
+
+
+class VNFForm(FlaskForm):
+    name = StringField('name', validators=[DataRequired()])
+    description = TextAreaField('description', validators=[DataRequired()])
+    submit = SubmitField('Upload')

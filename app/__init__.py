@@ -23,6 +23,7 @@ moment = Moment()
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+    app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
 
     db.init_app(app)
     migrate.init_app(app, db)
