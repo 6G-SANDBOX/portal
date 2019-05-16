@@ -142,7 +142,6 @@ def upload_VNF():
             fileNST = request.files['fileNST']
         except Exception as e:
             pass
-        print("ey")
 
         if fileVNFD.filename == '' or fileNDS.filename == '' or fileImage.filename == '':
             flash('There are files missing', 'error')
@@ -162,16 +161,18 @@ def upload_VNF():
             db.session.add(new_VNF)
             db.session.commit()
 
-            os.makedirs(UploaderConfig.UPLOAD_FOLDER+'/vnfs/'+str(new_VNF.id)+"/vnfd", mode=0o755, exist_ok=True)
-            os.makedirs(UploaderConfig.UPLOAD_FOLDER+'/vnfs/'+str(new_VNF.id)+"/nds", mode=0o755, exist_ok=True)
-            os.makedirs(UploaderConfig.UPLOAD_FOLDER+'/vnfs/'+str(new_VNF.id)+"/images", mode=0o755, exist_ok=True)
-            os.makedirs(UploaderConfig.UPLOAD_FOLDER+'/vnfs/'+str(new_VNF.id)+"/nst", mode=0o755, exist_ok=True)
+            baseFolder = os.path.join(UploaderConfig.UPLOAD_FOLDER, 'vnfs', str(new_VNF.id))
 
-            fileVNFD.save(os.path.join(UploaderConfig.UPLOAD_FOLDER, "vnfs", str(new_VNF.id), "vnfd", fileVNFD_name))
-            fileVNFD.save(os.path.join(UploaderConfig.UPLOAD_FOLDER, "vnfs", str(new_VNF.id), "nds", fileNDS_name))
-            fileVNFD.save(os.path.join(UploaderConfig.UPLOAD_FOLDER, "vnfs", str(new_VNF.id), "images", fileImage_name))
+            os.makedirs(os.path.join(baseFolder, "vnfd"), mode=0o755, exist_ok=True)
+            os.makedirs(os.path.join(baseFolder, "nds"), mode=0o755, exist_ok=True)
+            os.makedirs(os.path.join(baseFolder, "images"), mode=0o755, exist_ok=True)
+            os.makedirs(os.path.join(baseFolder, "nst"), mode=0o755, exist_ok=True)
+
+            fileVNFD.save(os.path.join(baseFolder, "vnfd", fileVNFD_name))
+            fileVNFD.save(os.path.join(baseFolder, "nds", fileNDS_name))
+            fileVNFD.save(os.path.join(baseFolder, "images", fileImage_name))
             if fileNST_name != '':
-                fileVNFD.save(os.path.join(UploaderConfig.UPLOAD_FOLDER, "vnfs", str(new_VNF.id), "nst", fileNST_name))
+                fileVNFD.save(os.path.join(baseFolder, "nst", fileNST_name))
 
             flash('Your VNF has been successfully uploaded', 'info')
             return redirect(url_for('main.vnf_repository'))

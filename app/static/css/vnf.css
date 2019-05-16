@@ -1,3 +1,8 @@
+.input-file-container {
+  position: relative;
+  width: 225px;
+}
+
 .js .input-file-trigger1, .js .input-file-trigger2, .js .input-file-trigger3, .js .input-file-trigger4 {
   padding: 6px 12px;
   border-radius: 4px;
