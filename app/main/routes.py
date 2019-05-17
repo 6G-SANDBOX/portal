@@ -113,6 +113,7 @@ def execution(execution_id):
                                            executor=executor, postRun=postRun, preRun=preRun)
             except Exception as e:
                 flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
+                return experiment(exe.experiment_id)
         else:
             flash(f'Forbidden - You don\'t have permission to access this execution', 'error')
             return redirect(url_for('main.index'))
@@ -123,6 +124,19 @@ def execution(execution_id):
 def vnf_repository():
     VNFs = current_user.user_VNFs()
     return render_template('vnf_repository.html', title='Home', VNFs=VNFs)
+
+
+@bp.route('/delete_VNF/<vnf_id>', methods=['GET'])
+@login_required
+def delete_VNF(vnf_id):
+    vnf = VNF.query.get(vnf_id)
+    if vnf.user_id == current_user.id:
+        db.session.delete(vnf)
+        db.session.commit()
+        flash(f'The VNF has been successfully removed', 'info')
+    else:
+        flash(f'Forbidden - You don\'t have permission to remove this VNF', 'error')
+    return redirect(url_for('main.vnf_repository'))
 
 
 @bp.route('/upload_VNF', methods=['GET', 'POST'])
