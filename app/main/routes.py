@@ -8,7 +8,7 @@ from app.main.forms import ExperimentForm, RunExperimentForm, VNFForm
 from Helper import Config, LogInfo
 from datetime import datetime
 from werkzeug.utils import secure_filename
-import os
+import os, shutil
 from config import Config as UploaderConfig
 
 
@@ -130,12 +130,16 @@ def vnf_repository():
 @login_required
 def delete_VNF(vnf_id):
     vnf = VNF.query.get(vnf_id)
-    if vnf.user_id == current_user.id:
-        db.session.delete(vnf)
-        db.session.commit()
-        flash(f'The VNF has been successfully removed', 'info')
+    if vnf:
+        if vnf.user_id == current_user.id:
+            db.session.delete(vnf)
+            db.session.commit()
+            shutil.rmtree(os.path.join(UploaderConfig.UPLOAD_FOLDER, 'vnfs', str(vnf_id)))
+            flash(f'The VNF has been successfully removed', 'info')
+        else:
+            flash(f'Forbidden - You don\'t have permission to remove this VNF', 'error')
     else:
-        flash(f'Forbidden - You don\'t have permission to remove this VNF', 'error')
+        return render_template('errors/404.html'), 404
     return redirect(url_for('main.vnf_repository'))
 
 
