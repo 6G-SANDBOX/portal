@@ -3,7 +3,7 @@
 
 {% block styles %}
 {{ super() }}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/vnf.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/browseFiles.css') }}">
 {% endblock %}
 
 {% block scripts %}
@@ -15,7 +15,7 @@
     document.getElementById('navbar-createExperiment').classList.remove('menuSelected');
 })();
 </script>
-<script src="{{url_for('static', filename='js/vnf.js')}}"></script>
+<script src="{{url_for('static', filename='js/browseFiles.js')}}"></script>
 {% endblock %}
 
 {% block app_content %}
@@ -43,33 +43,14 @@
                     </div>
                 </td>
             </tr>
-            <tr>
-                <th class="table-cell-divisor-right">Upload NDS</th>
-                <td>
-                    <div class="input-file-container">
-                        <input type="file" id="fileNDS" name="fileNDS" class="input-file2" required/>
-                        <label for="fileNDS" class="input-file-trigger2">Browse</label>
-                        <span class="file-return2"></span>
-                    </div>
-                </td>
-            </tr>
+
             <tr>
                 <th class="table-cell-divisor-right">Upload Image</th>
                 <td>
                     <div class="input-file-container">
-                        <input type="file" id="fileImage" name="fileImage" class="input-file3" required/>
-                        <label for="fileImage" class="input-file-trigger3">Browse</label>
-                        <span class="file-return3"></span>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <th class="table-cell-divisor-right">Upload NST <i>(Optional)</i></th>
-                <td>
-                    <div class="input-file-container">
-                        <input type="file" id="fileNST" name="fileNST" class="input-file4"/>
-                        <label for="fileNST" class="input-file-trigger4">Browse</label>
-                        <span class="file-return4"></span>
+                        <input type="file" id="fileImage" name="fileImage" class="input-file2" required/>
+                        <label for="fileImage" class="input-file-trigger2">Browse</label>
+                        <span class="file-return2"></span>
                     </div>
                 </td>
             </tr>

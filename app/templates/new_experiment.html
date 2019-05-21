@@ -1,7 +1,13 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/browseFiles.css') }}">
+{% endblock %}
+
 {% block scripts %}
+{{ super() }}
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 <script type="text/javascript">
         $(document).ready(function () {
@@ -21,6 +27,7 @@
     document.getElementById('navbar-vnf').classList.remove('menuSelected');
 })();
 </script>
+<script src="{{url_for('static', filename='js/browseFiles.js')}}"></script>
 {% endblock %}
 
 {% block app_content %}
@@ -30,7 +37,7 @@
 </br>
 <div class="col-sm-2" ></div>
 <div class="col-sm-8" >
-    <form id="form" method="post">
+    <form id="form" method="post" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <h4>Name</h4>
         <input class="form-control" type="text" name="name" required/>
@@ -52,6 +59,18 @@
         </div>
         {% endfor %}
         </br>
+        <table class="table table-header-right">
+            <tr>
+                <th class="table-cell-divisor-right">Upload NSD</th>
+                <td>
+                    <div class="input-file-container">
+                        <input type="file" id="fileNSD" name="fileNSD" class="input-file1" />
+                        <label for="fileNSD" class="input-file-trigger1">Browse</label>
+                        <span class="file-return1"></span>
+                    </div>
+                </td>
+            </tr>
+        </table>
         <button type="submit" id="checkBtn" name="submit" class="btn btn-darkBlue">Add Experiment</button>
     </form>
 </div>
