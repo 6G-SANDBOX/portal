@@ -62,3 +62,6 @@ class Config:
     def Description(self):
         return self.data['Description']
 
+    @property
+    def Slices(self):
+        return self.data['Slices']

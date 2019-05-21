@@ -9,24 +9,7 @@
 {% block scripts %}
 {{ super() }}
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-<script type="text/javascript">
-        $(document).ready(function () {
-            $('#checkBtn').click(function() {
-              checked = $("input[name=test_cases]:checked").length;
-              if(!checked) {
-                alert("Please, select at least one Test Case");
-                return false;
-              }
-            });
-        });
-</script>
-<script>
-(function() {
-    document.getElementById('navbar-createExperiment').classList.add('menuSelected');
-    document.getElementById('navbar-home').classList.remove('menuSelected');
-    document.getElementById('navbar-vnf').classList.remove('menuSelected');
-})();
-</script>
+<script src="{{url_for('static', filename='js/createExperiment.js')}}"></script>
 <script src="{{url_for('static', filename='js/browseFiles.js')}}"></script>
 {% endblock %}
 
@@ -35,8 +18,8 @@
     <h2>CREATE EXPERIMENT</h2>
 </div>
 </br>
-<div class="col-sm-2" ></div>
-<div class="col-sm-8" >
+<div class="col-sm-2"></div>
+<div class="col-sm-8">
     <form id="form" method="post" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <h4>Name</h4>
@@ -49,30 +32,45 @@
         <h4>Test Cases</h4>
         {% for test_case in test_case_list %}
         <div class="custom-control custom-checkbox">
-            <input type="checkbox" class="custom-control-input" name="test_cases" value="{{test_case}}"> {{test_case}}</br>
+            <input type="checkbox" class="custom-control-input" name="test_cases" value="{{test_case}}">
+            {{test_case}}
         </div>
         {% endfor %}
         <h4>UEs</h4>
         {% for ue in ue_list %}
         <div class="custom-control custom-checkbox">
-            <input type="checkbox" class="custom-control-input" name="ues" value="{{ue}}"> {{ue}}</br>
+            <input type="checkbox" class="custom-control-input" name="ues" value="{{ue}}"> {{ue}}
         </div>
         {% endfor %}
-        </br>
+        <h4>Slice</h4>
+        <div class="col-sm-12" style="padding: 0 !important; margin-bottom: 20px">
+            <div class="custom-control custom-checkbox col-sm-1" style="padding: 5px 0 !important; margin-right: -30px;">
+                <input type="checkbox" class="custom-control-input" id="slice_none" name="slice_none" onclick="disableSliceList()">
+            </div>
+            <div class="col-sm-11" style="padding: 0 !important;">
+                <select id="sliceList" class="form-control" name="slice" disabled>
+                    {% for slice in slice_list %}
+                    <option value="{{ slice }}">{{ slice }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
         <table class="table table-header-right">
             <tr>
-                <th class="table-cell-divisor-right">Upload NSD</th>
+                <th class="table-cell-divisor-right col-sm-2">Upload NSD</th>
                 <td>
                     <div class="input-file-container">
-                        <input type="file" id="fileNSD" name="fileNSD" class="input-file1" />
+                        <input type="file" id="fileNSD" name="fileNSD" class="input-file1"/>
                         <label for="fileNSD" class="input-file-trigger1">Browse</label>
                         <span class="file-return1"></span>
                     </div>
                 </td>
             </tr>
         </table>
+        </br>
+        </br>
         <button type="submit" id="checkBtn" name="submit" class="btn btn-darkBlue">Add Experiment</button>
     </form>
 </div>
-<div class="col-sm-2" ></div>
+<div class="col-sm-2"></div>
 {% endblock %}

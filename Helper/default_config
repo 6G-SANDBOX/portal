@@ -5,11 +5,13 @@ Dispatcher:
 TestCases:
   - RTT
 
+Slices:
+  - Slice1
+  - Slice2
 
 UEs:
   TestServer1:
     OS: Linux
-
 
 Platform:
   Málaga [UMA]

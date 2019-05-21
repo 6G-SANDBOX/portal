@@ -56,6 +56,9 @@ def new_experiment():
         
         experiment = Experiment(name=form.name.data, author=current_user, unattended=True, type=form.type.data,
                                 test_cases=test_cases_selected, ues=ues_selected)
+        form_slice=request.form.get('slice', None)
+        if form_slice is not None:
+            experiment.slice = form_slice
         db.session.add(experiment)
         db.session.commit()
         
@@ -77,8 +80,8 @@ def new_experiment():
         db.session.commit()
         flash('Your experiment has been successfully created', 'info')
         return redirect(url_for('main.index'))
-    return render_template('new_experiment.html', title='Home', form=form,
-                           test_case_list=Config().TestCases, ue_list=list_UEs)
+    return render_template('new_experiment.html', title='Home', form=form, test_case_list=Config().TestCases,
+                           ue_list=list_UEs, slice_list=Config().Slices)
 
 
 @bp.route('/experiment/<experiment_id>', methods=['GET', 'POST'])
