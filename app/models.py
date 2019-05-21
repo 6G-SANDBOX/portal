@@ -98,11 +98,13 @@ class Experiment(db.Model):
     unattended = db.Column(db.Boolean)
     test_cases = db.Column(JSONEncodedDict)
     ues = db.Column(JSONEncodedDict)
+    NSD = db.Column(db.String(256))
+    slice = db.Column(db.String(64))
     executions = db.relationship('Execution', backref='experiment', lazy='dynamic')
 
     def __repr__(self):
         return f'<Experiment: {self.id}, Name: {self.name}, User_id: {self.user_id}, Type: {self.type}, ' \
-            f'Unattended: {self.unattended}, TestCases: {self.test_cases}>'
+            f'Unattended: {self.unattended}, TestCases: {self.test_cases}, NSD: {self.NSD}, Slice: {self.slice}>'
 
     def experiment_executions(self):
         exp = Execution.query.filter_by(experiment_id=self.id)
@@ -117,7 +119,7 @@ class Experiment(db.Model):
                 if ue in all_UEs.keys(): ueDictionary[ue] = all_UEs[ue]
         dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(),
                       'Executions': execution_ids, "Platform": HelperConfig().Platform,
-                      "TestCases": self.test_cases, "UEs": ueDictionary}
+                      "TestCases": self.test_cases, "UEs": ueDictionary, "Slice": self.slice, "NSD": self.NSD}
         return dictionary
 
 
@@ -149,11 +151,9 @@ class VNF(db.Model):
     name = db.Column(db.String(64))
     description = db.Column(db.String(256))
     VNFD = db.Column(db.String(256))
-    NDS = db.Column(db.String(256))
-    NST = db.Column(db.String(256))
     image = db.Column(db.String(256))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
-        return f'<VNF {self.id}, Name {self.name}, Description {self.description}, VNFD {self.VNFD}, NDS {self.NDS} ' \
-            f'NST {self.NST}, Image {self.image}, User {self.user_id}>'
+        return f'<VNF {self.id}, Name {self.name}, Description {self.description}, VNFD {self.VNFD},' \
+            f'Image {self.image}, User {self.user_id}>'
