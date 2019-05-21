@@ -100,6 +100,7 @@ class Experiment(db.Model):
     ues = db.Column(JSONEncodedDict)
     NSD = db.Column(db.String(256))
     slice = db.Column(db.String(64))
+    vnflocations = db.relationship('VNFLocation', backref='experiment', lazy='dynamic')
     executions = db.relationship('Execution', backref='experiment', lazy='dynamic')
 
     def __repr__(self):
@@ -153,7 +154,18 @@ class VNF(db.Model):
     VNFD = db.Column(db.String(256))
     image = db.Column(db.String(256))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    vnf_locations = db.relationship('VNFLocation', backref='vnf_file', lazy='dynamic')
 
     def __repr__(self):
         return f'<VNF {self.id}, Name {self.name}, Description {self.description}, VNFD {self.VNFD},' \
             f'Image {self.image}, User {self.user_id}>'
+
+
+class VNFLocation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    location = db.Column(db.String(32))
+    VNF_id = db.Column(db.Integer, db.ForeignKey('VNF.id'))
+    experiment_id = db.Column(db.Integer, db.ForeignKey('experiment.id'))
+
+    def __repr__(self):
+        return f'<VNFLocation {self.id}, VNF_id {self.VNF_id}, Location {self.location}'
