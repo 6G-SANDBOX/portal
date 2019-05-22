@@ -46,6 +46,9 @@ def index():
 @login_required
 def new_experiment():
     list_UEs = list(Config().UEs.keys())
+    vnfs = []
+    for vnf in current_user.user_VNFs():
+        vnfs.append(vnf.name)
     form = ExperimentForm()
     if form.validate_on_submit():
         test_cases_selected = request.form.getlist('test_cases')
@@ -81,7 +84,7 @@ def new_experiment():
         flash('Your experiment has been successfully created', 'info')
         return redirect(url_for('main.index'))
     return render_template('new_experiment.html', title='Home', form=form, test_case_list=Config().TestCases,
-                           ue_list=list_UEs, slice_list=Config().Slices)
+                           ue_list=list_UEs, slice_list=Config().Slices, vnfs=vnfs)
 
 
 @bp.route('/experiment/<experiment_id>', methods=['GET', 'POST'])

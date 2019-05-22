@@ -8,9 +8,27 @@
 
 {% block scripts %}
 {{ super() }}
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script src="{{url_for('static', filename='js/createExperiment.js')}}"></script>
 <script src="{{url_for('static', filename='js/browseFiles.js')}}"></script>
+<script>
+(function() {
+  $("#vnf_count").bind('change', function() {
+    curVal = $.trim($(this).val()).match(/^\d*$/);
+    curFloors = $('.vnf').length;
+    vnfs = []
+    {% for vnf in vnfs %}
+      vnfs.push("{{ vnf }}");
+    {% endfor %}
+    if (curVal > curFloors) {
+      addVNFs(curFloors, curVal, vnfs);
+    } else if (curVal < curFloors) {
+      removeVNFs(curVal);
+    }
+  })
+})();
+
+</script>
 {% endblock %}
 
 {% block app_content %}
@@ -44,8 +62,10 @@
         {% endfor %}
         <h4>Slice</h4>
         <div class="col-sm-12" style="padding: 0 !important; margin-bottom: 20px">
-            <div class="custom-control custom-checkbox col-sm-1" style="padding: 5px 0 !important; margin-right: -30px;">
-                <input type="checkbox" class="custom-control-input" id="slice_none" name="slice_none" onclick="disableSliceList()">
+            <div class="custom-control custom-checkbox col-sm-1"
+                 style="padding: 5px 0 !important; margin-right: -30px;">
+                <input type="checkbox" class="custom-control-input" id="slice_none" name="slice_none"
+                       onclick="disableSliceList()">
             </div>
             <div class="col-sm-11" style="padding: 0 !important;">
                 <select id="sliceList" class="form-control" name="slice" disabled>
@@ -55,6 +75,26 @@
                 </select>
             </div>
         </div>
+        <h4>VNFs
+            <input type="number" id="vnf_count" name="vnf_count" class="InputBox form-control" value="0" min="0" max="24"
+                   style="width: 10%;"/>
+        </h4>
+        <div class="div-wrapper-scrollbar actions-scrollbar">
+            <table id="vnf" class="table table-header">
+                <tr id="headtable">
+                    <th class="table-cell-divisor-right col-sm-1">
+                    </td>
+                    <th class="table-cell-divisor-right col-sm-8">
+                        <center>Select VNF</center>
+                    </td>
+                    <th class="col-sm-3">
+                        <center>Location</center>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        </br>
+        </br>
         <table class="table table-header-right">
             <tr>
                 <th class="table-cell-divisor-right col-sm-2">Upload NSD</th>

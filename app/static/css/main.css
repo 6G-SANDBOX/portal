@@ -7,7 +7,7 @@
 
 .actions-scrollbar {
     position: relative;
-    height: 300px;
+    max-height: 300px;
     overflow: auto;
     margin-top: 15px;
     scrollbar-color: #a1daf8 #e7f6fd;
