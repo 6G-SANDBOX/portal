@@ -49,7 +49,7 @@ class User(UserMixin, db.Model):
     VNFs = db.relationship('VNF', backref='author', lazy='dynamic')
 
     def __repr__(self):
-        return f'<User: {self.id}, Username: {self.username}, Email: {self.email}, Organization: {self.organization}'
+        return f'<Id: {self.id}, Username: {self.username}, Email: {self.email}, Organization: {self.organization}'
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -104,7 +104,7 @@ class Experiment(db.Model):
     executions = db.relationship('Execution', backref='experiment', lazy='dynamic')
 
     def __repr__(self):
-        return f'<Experiment: {self.id}, Name: {self.name}, User_id: {self.user_id}, Type: {self.type}, ' \
+        return f'<Id: {self.id}, Name: {self.name}, User_id: {self.user_id}, Type: {self.type}, ' \
             f'Unattended: {self.unattended}, TestCases: {self.test_cases}, NSD: {self.NSD}, Slice: {self.slice}>'
 
     def experiment_executions(self):
@@ -146,8 +146,8 @@ class Execution(db.Model):
     status = db.Column(db.String(32))
 
     def __repr__(self):
-        return f'<Execution {self.id}, Experiment_id {self.experiment_id}, Start_time {self.start_time}, ' \
-            f'End_time {self.end_time}, Status {self.status}>'
+        return f'<Id: {self.id}, Experiment_id: {self.experiment_id}, Start_time: {self.start_time}, ' \
+            f'End_time: {self.end_time}, Status: {self.status}>'
 
 
 class Action(db.Model):
@@ -157,8 +157,8 @@ class Action(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
-        return f'<Action {self.id}, Timestamp {self.timestamp}, Message {self.message}, ' \
-            f'User {self.user_id}>'
+        return f'<Id: {self.id}, Timestamp: {self.timestamp}, Message: {self.message}, ' \
+            f'User_id: {self.user_id}>'
 
 
 class VNF(db.Model):
@@ -171,8 +171,8 @@ class VNF(db.Model):
     vnf_locations = db.relationship('VNFLocation', backref='vnf_file', lazy='dynamic')
 
     def __repr__(self):
-        return f'<VNF {self.id}, Name {self.name}, Description {self.description}, VNFD {self.VNFD},' \
-            f'Image {self.image}, User {self.user_id}>'
+        return f'<VNF: {self.id}, Name: {self.name}, Description: {self.description}, VNFD: {self.VNFD},' \
+            f'Image: {self.image}, User_id: {self.user_id}>'
 
     def serialization(self):
         dictionary = {'Id': self.id, 'Name': self.name, 'Description': self.description, 'VNFD': self.VNFD,
@@ -187,4 +187,4 @@ class VNFLocation(db.Model):
     experiment_id = db.Column(db.Integer, db.ForeignKey('experiment.id'))
 
     def __repr__(self):
-        return f'<VNFLocation {self.id}, VNF_id {self.VNF_id}, Location {self.location}, Experiment {self.experiment_id}>'
+        return f'<Id: {self.id}, VNF_id: {self.VNF_id}, Location: {self.location}, Experiment_id: {self.experiment_id}>'

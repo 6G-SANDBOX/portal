@@ -198,6 +198,11 @@ def upload_VNF():
             db.session.add(new_VNF)
             db.session.commit()
 
+            action = Action(timestamp=datetime.utcnow(), author=current_user,
+                            message=f'<a href="/vnf_repository">Uploaded VNF: {new_VNF.name}</a>')
+            db.session.add(action)
+            db.session.commit()
+
             baseFolder = os.path.join(UploaderConfig.UPLOAD_FOLDER, 'vnfs', str(new_VNF.id))
             os.makedirs(os.path.join(baseFolder, "vnfd"), mode=0o755, exist_ok=True)
             os.makedirs(os.path.join(baseFolder, "images"), mode=0o755, exist_ok=True)
