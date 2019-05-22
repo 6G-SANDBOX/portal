@@ -16,11 +16,11 @@ $(document).ready(
   }
 );
 
-function addVNFs(actual, target, vnfs) {
+function addVNFs(actual, target, vnfs, vnfs_id) {
   for (i = actual + 1; i <= target; i++) {
     newItemHTML = '<tr><td class="table-cell-divisor-right"><center>' + i + '</center></td><td class="table-cell-divisor-right"><select class="vnf InputBox form-control" name="VNF' + i + '">'
     for (j = 0; j < vnfs.length; j++) {
-      newItemHTML = newItemHTML + '<option value="' + vnfs[j] + '">' + vnfs[j] + '</option>';
+      newItemHTML = newItemHTML + '<option value="' + vnfs_id[j] + '">' + vnfs[j] + '</option>';
     }
     newItemHTML = newItemHTML + '</select></td><td><select class="form-control" name="location' + i + '"><option value="Data Network" selected>Data Network</option><option value="Edge">Edge</option></select></td></tr>'
     $("table#vnf tr").last().after(newItemHTML);

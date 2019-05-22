@@ -17,11 +17,15 @@
     curVal = $.trim($(this).val()).match(/^\d*$/);
     curFloors = $('.vnf').length;
     vnfs = []
+    vnfs_id = []
     {% for vnf in vnfs %}
       vnfs.push("{{ vnf }}");
     {% endfor %}
+    {% for vnf_id in vnfs_id %}
+      vnfs_id.push("{{ vnf_id }}");
+    {% endfor %}
     if (curVal > curFloors) {
-      addVNFs(curFloors, curVal, vnfs);
+      addVNFs(curFloors, curVal, vnfs, vnfs_id);
     } else if (curVal < curFloors) {
       removeVNFs(curVal);
     }

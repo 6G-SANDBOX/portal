@@ -111,6 +111,10 @@ class Experiment(db.Model):
         exp = Execution.query.filter_by(experiment_id=self.id)
         return exp.order_by(Execution.id.desc())
 
+    def experiment_vnfs(self):
+        vnfs = VNFLocation.query.filter_by(experiment_id=self.id)
+        return vnfs.order_by(VNFLocation.id.asc())
+
     def serialization(self):
         execution_ids = [exe.id for exe in self.experiment_executions()]
         ueDictionary = {}
@@ -118,9 +122,19 @@ class Experiment(db.Model):
         if self.ues:
             for ue in self.ues:
                 if ue in all_UEs.keys(): ueDictionary[ue] = all_UEs[ue]
+        vnfs_locations = []
+        for vnf_loc in self.experiment_vnfs():
+            vnf_location = VNF.query.get(vnf_loc.VNF_id).serialization()
+            vnf_location['Location'] = vnf_loc.location
+            vnfs_locations.append(vnf_location)
+        #if self.vnflocations:
+            #for vnf_loc in self.vnflocations:
+                #vnfs_locations[vnf_loc]
+
         dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(),
                       'Executions': execution_ids, "Platform": HelperConfig().Platform,
-                      "TestCases": self.test_cases, "UEs": ueDictionary, "Slice": self.slice, "NSD": self.NSD}
+                      "TestCases": self.test_cases, "UEs": ueDictionary, "Slice": self.slice, "NSD": self.NSD,
+                      "VNF_Locations": vnfs_locations}
         return dictionary
 
 
@@ -160,6 +174,11 @@ class VNF(db.Model):
         return f'<VNF {self.id}, Name {self.name}, Description {self.description}, VNFD {self.VNFD},' \
             f'Image {self.image}, User {self.user_id}>'
 
+    def serialization(self):
+        dictionary = {'Id': self.id, 'Name': self.name, 'Description': self.description, 'VNFD': self.VNFD,
+                      "Image": self.image, "User": self.user_id}
+        return dictionary
+
 
 class VNFLocation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -168,4 +187,4 @@ class VNFLocation(db.Model):
     experiment_id = db.Column(db.Integer, db.ForeignKey('experiment.id'))
 
     def __repr__(self):
-        return f'<VNFLocation {self.id}, VNF_id {self.VNF_id}, Location {self.location}'
+        return f'<VNFLocation {self.id}, VNF_id {self.VNF_id}, Location {self.location}, Experiment {self.experiment_id}>'

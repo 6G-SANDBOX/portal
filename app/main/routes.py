@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 from REST import Dispatcher_Api
 from app import db
 from app.main import bp
-from app.models import User, Experiment, Execution, Action, VNF
+from app.models import User, Experiment, Execution, Action, VNF, VNFLocation
 from app.main.forms import ExperimentForm, RunExperimentForm, VNFForm
 from Helper import Config, LogInfo
 from datetime import datetime
@@ -47,8 +47,10 @@ def index():
 def new_experiment():
     list_UEs = list(Config().UEs.keys())
     vnfs = []
+    vnfs_id = []
     for vnf in current_user.user_VNFs():
         vnfs.append(vnf.name)
+        vnfs_id.append(vnf.id)
     form = ExperimentForm()
     if form.validate_on_submit():
         test_cases_selected = request.form.getlist('test_cases')
@@ -62,9 +64,17 @@ def new_experiment():
         form_slice=request.form.get('slice', None)
         if form_slice is not None:
             experiment.slice = form_slice
+
         db.session.add(experiment)
         db.session.commit()
-        
+
+        for i in range(int(request.form['vnf_count'])):
+            loc='location'+str(i+1)
+            vnf='VNF'+str(i+1)
+            vnf_loc = VNFLocation(location=request.form[loc], VNF_id=request.form[vnf], experiment_id=experiment.id)
+            db.session.add(vnf_loc)
+            db.session.commit()
+
         baseFolder = os.path.join(UploaderConfig.UPLOAD_FOLDER, 'experiment', str(experiment.id))
         os.makedirs(os.path.join(baseFolder, "nsd"), mode=0o755, exist_ok=True)
 
@@ -84,7 +94,7 @@ def new_experiment():
         flash('Your experiment has been successfully created', 'info')
         return redirect(url_for('main.index'))
     return render_template('new_experiment.html', title='Home', form=form, test_case_list=Config().TestCases,
-                           ue_list=list_UEs, slice_list=Config().Slices, vnfs=vnfs)
+                           ue_list=list_UEs, slice_list=Config().Slices, vnfs=vnfs, vnfs_id=vnfs_id)
 
 
 @bp.route('/experiment/<experiment_id>', methods=['GET', 'POST'])
