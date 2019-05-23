@@ -127,9 +127,6 @@ class Experiment(db.Model):
             vnf_location = VNF.query.get(vnf_loc.VNF_id).serialization()
             vnf_location['Location'] = vnf_loc.location
             vnfs_locations.append(vnf_location)
-        #if self.vnflocations:
-            #for vnf_loc in self.vnflocations:
-                #vnfs_locations[vnf_loc]
 
         dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(),
                       'Executions': execution_ids, "Platform": HelperConfig().Platform,
@@ -144,10 +141,11 @@ class Execution(db.Model):
     start_time = db.Column(db.DATETIME)
     end_time = db.Column(db.DATETIME)
     status = db.Column(db.String(32))
+    dashboard_url = db.Column(db.String(64))
 
     def __repr__(self):
         return f'<Id: {self.id}, Experiment_id: {self.experiment_id}, Start_time: {self.start_time}, ' \
-            f'End_time: {self.end_time}, Status: {self.status}>'
+            f'End_time: {self.end_time}, Status: {self.status}, Dashboard_url: {self.dashboard_url}>'
 
 
 class Action(db.Model):
