@@ -209,11 +209,8 @@ def upload_VNF():
 
 def runExperiment(config):
     try:
-        print("1")
         api = Dispatcher_Api(config.Dispatcher.Host, config.Dispatcher.Port, "/api/v0")  # //api/v0
-        print("2")
         jsonresponse = api.Post(request.form['id'])
-        print("3")
         flash(f'Success: {jsonresponse["Success"]} - Execution Id: '
               f'{jsonresponse["ExecutionId"]} - Message: {jsonresponse["Message"]}', 'info')
         execution = Execution(id=jsonresponse["ExecutionId"], experiment_id=request.form['id'],

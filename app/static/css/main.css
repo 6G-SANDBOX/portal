@@ -106,3 +106,8 @@ th, td{
 .table {
     margin-bottom: 0px !important;
 }
+
+a.disable {
+  pointer-events: none;
+  cursor: default;
+}
