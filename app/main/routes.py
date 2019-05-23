@@ -103,7 +103,7 @@ def experiment(experiment_id):
                 return redirect(url_for('main.index'))
             else:
                 return render_template('experiment.html', title='Experiment', experiment=exp, executions=executions,
-                                       formRun=formRun)
+                                       formRun=formRun, grafana_url=config.GrafanaUrl)
         else:
             flash(f'Forbidden - You don\'t have permission to access this experiment', 'error')
             return redirect(url_for('main.index'))
@@ -132,7 +132,8 @@ def execution(execution_id):
                     postRun = LogInfo(jsonresponse["PostRun"])
                     preRun = LogInfo(jsonresponse["PreRun"])
                     return render_template('execution.html', title='Execution', execution=exe, log_status=status,
-                                           executor=executor, postRun=postRun, preRun=preRun, experiment=exp)
+                                           executor=executor, postRun=postRun, preRun=preRun, experiment=exp,
+                                           grafana_url=config.GrafanaUrl)
             except Exception as e:
                 flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
                 return experiment(exe.experiment_id)

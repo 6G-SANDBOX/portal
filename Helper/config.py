@@ -65,3 +65,7 @@ class Config:
     @property
     def Slices(self):
         return self.data['Slices']
+
+    @property
+    def GrafanaUrl(self):
+        return self.data['Grafana URL']
