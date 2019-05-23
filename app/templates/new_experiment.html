@@ -39,18 +39,23 @@
 <div style="text-align: center">
     <h2>CREATE EXPERIMENT</h2>
 </div>
-</br>
 <div class="col-sm-2"></div>
 <div class="col-sm-8">
     <form id="form" method="post" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
-        <h4>Name</h4>
-        <input class="form-control" type="text" name="name" required/>
-        <h4>Type</h4>
-        <select class="form-control" name="type">
-            <option value="Standard" selected>Standard</option>
-            <option value="Custom" disabled>Custom</option>
-        </select>
+        <div class="col-sm-12" style="padding: 0 !important; margin-bottom: 25px">
+            <div class="col-sm-8">
+                <h4>Name</h4>
+                <input class="form-control" type="text" name="name" required/>
+            </div>
+            <div class="col-sm-4">
+                <h4>Type</h4>
+                <select class="form-control" name="type">
+                    <option value="Standard" selected>Standard</option>
+                    <option value="Custom" disabled>Custom</option>
+                </select>
+            </div>
+        </div>
         <h4>Test Cases</h4>
         {% for test_case in test_case_list %}
         <div class="custom-control custom-checkbox">
@@ -79,8 +84,10 @@
                 </select>
             </div>
         </div>
+        {% if vnfs %}
         <h4>VNFs
-            <input type="number" id="vnf_count" name="vnf_count" class="InputBox form-control" value="0" min="0" max="24"
+            <input type="number" id="vnf_count" name="vnf_count" class="InputBox form-control" value="0" min="0"
+                   max="24"
                    style="width: 10%;"/>
         </h4>
         <div class="div-wrapper-scrollbar actions-scrollbar">
@@ -98,6 +105,12 @@
             </table>
         </div>
         </br>
+        {% else %}
+        <h4>VNFs</h4>
+        <h5>You have not defined any VNF yet.
+            <a class="btn btn-blue" href="{{ url_for('main.upload_VNF') }}" role="button">Upload VNF</a>
+        </h5>
+        {% endif %}
         </br>
         <table class="table table-header-right">
             <tr>

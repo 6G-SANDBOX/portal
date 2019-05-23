@@ -34,7 +34,7 @@ h4{
     color: #777777;
 }
 
-form > h4{
+form > h4, div > h4{
     color: #005b90 !important;
 }
 
