@@ -62,10 +62,10 @@
             {{ experiment.name }}
         </td>
         <td>
-            {% if not execution.dashboard_url%}
+            {% if grafana_url == None or not execution.dashboard_url %}
             <a class="btn btn-primary btn-sm disabled" href="#" role="button">Results</a>
             {% else %}
-            <a class="btn btn-blue btn-sm" href="{{ execution.dashboard_url }}" role="button" target="_blank">Results</a>
+            <a class="btn btn-blue btn-sm" href="{{ grafana_url }}{{ execution.dashboard_url }}" role="button" target="_blank">Results</a>
             {% endif %}
         </td>
     </tr>
