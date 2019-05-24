@@ -91,7 +91,7 @@ def experiment(experiment_id):
     config = Config()
     if formRun.validate_on_submit():
         runExperiment(config)
-        return redirect(url_for('main.index'))
+        return redirect(request.url)
     if exp is None:
         flash(f'Experiment not found', 'error')
         return redirect(url_for('main.index'))
