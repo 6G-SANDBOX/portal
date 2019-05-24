@@ -34,9 +34,10 @@ def new_experiment():
     list_UEs = list(Config().UEs.keys())
     vnfs = []
     vnfs_id = []
-    for vnf in current_user.user_VNFs():
-        vnfs.append(vnf.name)
-        vnfs_id.append(vnf.id)
+    if not current_user.user_VNFs():
+        for vnf in current_user.user_VNFs():
+            vnfs.append(vnf.name)
+            vnfs_id.append(vnf.id)
     form = ExperimentForm()
     if form.validate_on_submit():
         test_cases_selected = request.form.getlist('test_cases')
@@ -53,8 +54,11 @@ def new_experiment():
 
         db.session.add(experiment)
         db.session.commit()
-
-        for i in range(int(request.form['vnf_count'])):
+        if 'vnf_count' in request.form:
+            count = int(request.form['vnf_count'])
+        else:
+            count = 0
+        for i in range(count):
             loc='location'+str(i+1)
             vnf='VNF'+str(i+1)
             vnf_loc = VNFLocation(location=request.form[loc], VNF_id=request.form[vnf], experiment_id=experiment.id)
