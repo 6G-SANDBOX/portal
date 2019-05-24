@@ -3,7 +3,6 @@ from datetime import datetime
 from app import db
 from app.api import bp
 from app.models import Execution
-from Helper import Config
 import json
 
 
@@ -19,7 +18,11 @@ def set_execution_status(execution_id):
         execution.status = data["Status"]
     if 'Dashboard' in data:
         execution.dashboard_url = str(data["Dashboard"])
-
+    if 'PerCent' in data:
+        execution.percent = data["PerCent"]
+    if 'Message' in data:
+        execution.message = str(data["Message"])
     db.session.commit()
+
     print('Status of Execution ' + str(execution.id) + ' changed to ' + execution.status)
     return ""
