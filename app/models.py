@@ -49,7 +49,7 @@ class User(UserMixin, db.Model):
     VNFs = db.relationship('VNF', backref='author', lazy='dynamic')
 
     def __repr__(self):
-        return f'<User: {self.id}, Username: {self.username}, Email: {self.email}, Organization: {self.organization}'
+        return f'<Id: {self.id}, Username: {self.username}, Email: {self.email}, Organization: {self.organization}'
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -98,15 +98,22 @@ class Experiment(db.Model):
     unattended = db.Column(db.Boolean)
     test_cases = db.Column(JSONEncodedDict)
     ues = db.Column(JSONEncodedDict)
+    NSD = db.Column(db.String(256))
+    slice = db.Column(db.String(64))
+    vnflocations = db.relationship('VNFLocation', backref='experiment', lazy='dynamic')
     executions = db.relationship('Execution', backref='experiment', lazy='dynamic')
 
     def __repr__(self):
-        return f'<Experiment: {self.id}, Name: {self.name}, User_id: {self.user_id}, Type: {self.type}, ' \
-            f'Unattended: {self.unattended}, TestCases: {self.test_cases}>'
+        return f'<Id: {self.id}, Name: {self.name}, User_id: {self.user_id}, Type: {self.type}, ' \
+            f'Unattended: {self.unattended}, TestCases: {self.test_cases}, NSD: {self.NSD}, Slice: {self.slice}>'
 
     def experiment_executions(self):
         exp = Execution.query.filter_by(experiment_id=self.id)
         return exp.order_by(Execution.id.desc())
+
+    def experiment_vnfs(self):
+        vnfs = VNFLocation.query.filter_by(experiment_id=self.id)
+        return vnfs.order_by(VNFLocation.id.asc())
 
     def serialization(self):
         execution_ids = [exe.id for exe in self.experiment_executions()]
@@ -115,9 +122,19 @@ class Experiment(db.Model):
         if self.ues:
             for ue in self.ues:
                 if ue in all_UEs.keys(): ueDictionary[ue] = all_UEs[ue]
+        vnfs_locations = []
+        for vnf_loc in self.experiment_vnfs():
+            vnf_location = VNF.query.get(vnf_loc.VNF_id).serialization()
+            vnf_location['Location'] = vnf_loc.location
+            vnfs_locations.append(vnf_location)
+        #if self.vnflocations:
+            #for vnf_loc in self.vnflocations:
+                #vnfs_locations[vnf_loc]
+
         dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(),
                       'Executions': execution_ids, "Platform": HelperConfig().Platform,
-                      "TestCases": self.test_cases, "UEs": ueDictionary}
+                      "TestCases": self.test_cases, "UEs": ueDictionary, "Slice": self.slice, "NSD": self.NSD,
+                      "VNF_Locations": vnfs_locations}
         return dictionary
 
 
@@ -129,8 +146,8 @@ class Execution(db.Model):
     status = db.Column(db.String(32))
 
     def __repr__(self):
-        return f'<Execution {self.id}, Experiment_id {self.experiment_id}, Start_time {self.start_time}, ' \
-            f'End_time {self.end_time}, Status {self.status}>'
+        return f'<Id: {self.id}, Experiment_id: {self.experiment_id}, Start_time: {self.start_time}, ' \
+            f'End_time: {self.end_time}, Status: {self.status}>'
 
 
 class Action(db.Model):
@@ -140,8 +157,8 @@ class Action(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
-        return f'<Action {self.id}, Timestamp {self.timestamp}, Message {self.message}, ' \
-            f'User {self.user_id}>'
+        return f'<Id: {self.id}, Timestamp: {self.timestamp}, Message: {self.message}, ' \
+            f'User_id: {self.user_id}>'
 
 
 class VNF(db.Model):
@@ -149,11 +166,25 @@ class VNF(db.Model):
     name = db.Column(db.String(64))
     description = db.Column(db.String(256))
     VNFD = db.Column(db.String(256))
-    NDS = db.Column(db.String(256))
-    NST = db.Column(db.String(256))
     image = db.Column(db.String(256))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    vnf_locations = db.relationship('VNFLocation', backref='vnf_file', lazy='dynamic')
 
     def __repr__(self):
-        return f'<VNF {self.id}, Name {self.name}, Description {self.description}, VNFD {self.VNFD}, NDS {self.NDS} ' \
-            f'NST {self.NST}, Image {self.image}, User {self.user_id}>'
+        return f'<VNF: {self.id}, Name: {self.name}, Description: {self.description}, VNFD: {self.VNFD},' \
+            f'Image: {self.image}, User_id: {self.user_id}>'
+
+    def serialization(self):
+        dictionary = {'Id': self.id, 'Name': self.name, 'Description': self.description, 'VNFD': self.VNFD,
+                      "Image": self.image, "User": self.user_id}
+        return dictionary
+
+
+class VNFLocation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    location = db.Column(db.String(32))
+    VNF_id = db.Column(db.Integer, db.ForeignKey('VNF.id'))
+    experiment_id = db.Column(db.Integer, db.ForeignKey('experiment.id'))
+
+    def __repr__(self):
+        return f'<Id: {self.id}, VNF_id: {self.VNF_id}, Location: {self.location}, Experiment_id: {self.experiment_id}>'

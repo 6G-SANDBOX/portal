@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 from REST import Dispatcher_Api
 from app import db
 from app.main import bp
-from app.models import User, Experiment, Execution, Action, VNF
+from app.models import User, Experiment, Execution, Action, VNF, VNFLocation
 from app.main.forms import ExperimentForm, RunExperimentForm, VNFForm
 from Helper import Config, LogInfo
 from datetime import datetime
@@ -46,6 +46,11 @@ def index():
 @login_required
 def new_experiment():
     list_UEs = list(Config().UEs.keys())
+    vnfs = []
+    vnfs_id = []
+    for vnf in current_user.user_VNFs():
+        vnfs.append(vnf.name)
+        vnfs_id.append(vnf.id)
     form = ExperimentForm()
     if form.validate_on_submit():
         test_cases_selected = request.form.getlist('test_cases')
@@ -53,18 +58,43 @@ def new_experiment():
         if not test_cases_selected:
             flash(f'Please, select at least one Test Case', 'error')
             return redirect(url_for('main.new_experiment'))
+        
         experiment = Experiment(name=form.name.data, author=current_user, unattended=True, type=form.type.data,
                                 test_cases=test_cases_selected, ues=ues_selected)
+        form_slice=request.form.get('slice', None)
+        if form_slice is not None:
+            experiment.slice = form_slice
+
         db.session.add(experiment)
         db.session.commit()
+
+        for i in range(int(request.form['vnf_count'])):
+            loc='location'+str(i+1)
+            vnf='VNF'+str(i+1)
+            vnf_loc = VNFLocation(location=request.form[loc], VNF_id=request.form[vnf], experiment_id=experiment.id)
+            db.session.add(vnf_loc)
+            db.session.commit()
+
+        baseFolder = os.path.join(UploaderConfig.UPLOAD_FOLDER, 'experiment', str(experiment.id))
+        os.makedirs(os.path.join(baseFolder, "nsd"), mode=0o755, exist_ok=True)
+
+        if 'fileNSD' in request.files:
+            fileNSD = request.files['fileNSD']
+            if fileNSD.filename != '':
+                fileNSD_name = secure_filename(fileNSD.filename)
+                fileNSD.save(os.path.join(baseFolder, "nsd", fileNSD_name))
+                experiment.NSD = fileNSD_name
+                db.session.add(experiment)
+                db.session.commit()
+        
         action = Action(timestamp=datetime.utcnow(), author=current_user,
                         message=f'<a href="/experiment/{experiment.id}">Created experiment: {form.name.data}</a>')
         db.session.add(action)
         db.session.commit()
         flash('Your experiment has been successfully created', 'info')
         return redirect(url_for('main.index'))
-    return render_template('new_experiment.html', title='Home', form=form,
-                           test_case_list=Config().TestCases, ue_list=list_UEs)
+    return render_template('new_experiment.html', title='Home', form=form, test_case_list=Config().TestCases,
+                           ue_list=list_UEs, slice_list=Config().Slices, vnfs=vnfs, vnfs_id=vnfs_id)
 
 
 @bp.route('/experiment/<experiment_id>', methods=['GET', 'POST'])
@@ -148,49 +178,36 @@ def delete_VNF(vnf_id):
 def upload_VNF():
     form = VNFForm()
     if form.validate_on_submit():
-        if 'fileVNFD' not in request.files or 'fileNDS' not in request.files or 'fileImage' not in request.files:
+        if 'fileVNFD' not in request.files or 'fileImage' not in request.files:
             flash('There are files missing', 'error')
             return redirect(request.url)
 
         fileVNFD = request.files['fileVNFD']
-        fileNDS = request.files['fileNDS']
         fileImage = request.files['fileImage']
-        fileNST = ""
-        try:
-            fileNST = request.files['fileNST']
-        except Exception as e:
-            pass
 
-        if fileVNFD.filename == '' or fileNDS.filename == '' or fileImage.filename == '':
+        if fileVNFD.filename == '' or fileImage.filename == '':
             flash('There are files missing', 'error')
             return redirect(request.url)
 
-        if fileVNFD and fileNDS and fileImage:
+        if fileVNFD and fileImage:
             fileVNFD_name = secure_filename(fileVNFD.filename)
-            fileNDS_name = secure_filename(fileNDS.filename)
             fileImage_name = secure_filename(fileImage.filename)
-            if fileNST != '':
-                fileNST_name = secure_filename(fileNST.filename)
-            else:
-                fileNST_name = ""
 
             new_VNF = VNF(name=form.name.data, author=current_user, description=form.description.data,
-                          VNFD=fileVNFD_name, NDS=fileNDS_name, image=fileImage_name, NST=fileNST_name)
+                          VNFD=fileVNFD_name, image=fileImage_name)
             db.session.add(new_VNF)
             db.session.commit()
 
+            action = Action(timestamp=datetime.utcnow(), author=current_user,
+                            message=f'<a href="/vnf_repository">Uploaded VNF: {new_VNF.name}</a>')
+            db.session.add(action)
+            db.session.commit()
+
             baseFolder = os.path.join(UploaderConfig.UPLOAD_FOLDER, 'vnfs', str(new_VNF.id))
-
             os.makedirs(os.path.join(baseFolder, "vnfd"), mode=0o755, exist_ok=True)
-            os.makedirs(os.path.join(baseFolder, "nds"), mode=0o755, exist_ok=True)
             os.makedirs(os.path.join(baseFolder, "images"), mode=0o755, exist_ok=True)
-            os.makedirs(os.path.join(baseFolder, "nst"), mode=0o755, exist_ok=True)
-
             fileVNFD.save(os.path.join(baseFolder, "vnfd", fileVNFD_name))
-            fileVNFD.save(os.path.join(baseFolder, "nds", fileNDS_name))
-            fileVNFD.save(os.path.join(baseFolder, "images", fileImage_name))
-            if fileNST_name != '':
-                fileVNFD.save(os.path.join(baseFolder, "nst", fileNST_name))
+            fileImage.save(os.path.join(baseFolder, "images", fileImage_name))
 
             flash('Your VNF has been successfully uploaded', 'info')
             return redirect(url_for('main.vnf_repository'))
