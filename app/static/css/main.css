@@ -67,6 +67,12 @@ li > a:hover{
     border-color: #0089d2;
 }
 
+.btn-delete {
+    color: #ffffff;
+    background-color: red;
+    border-color: #005b90;
+}
+
 .btn-darkBlue.focus, .btn-blue.focus, .btn-lightBlue.focus{
     color: #ffffff;
 }

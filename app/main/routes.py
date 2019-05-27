@@ -8,7 +8,7 @@ from app.main.forms import ExperimentForm, RunExperimentForm, VNFForm
 from Helper import Config, LogInfo
 from datetime import datetime
 from werkzeug.utils import secure_filename
-import os
+import os, shutil
 from config import Config as UploaderConfig
 
 
@@ -113,6 +113,7 @@ def execution(execution_id):
                                            executor=executor, postRun=postRun, preRun=preRun)
             except Exception as e:
                 flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
+                return experiment(exe.experiment_id)
         else:
             flash(f'Forbidden - You don\'t have permission to access this execution', 'error')
             return redirect(url_for('main.index'))
@@ -123,6 +124,23 @@ def execution(execution_id):
 def vnf_repository():
     VNFs = current_user.user_VNFs()
     return render_template('vnf_repository.html', title='Home', VNFs=VNFs)
+
+
+@bp.route('/delete_VNF/<vnf_id>', methods=['GET'])
+@login_required
+def delete_VNF(vnf_id):
+    vnf = VNF.query.get(vnf_id)
+    if vnf:
+        if vnf.user_id == current_user.id:
+            db.session.delete(vnf)
+            db.session.commit()
+            shutil.rmtree(os.path.join(UploaderConfig.UPLOAD_FOLDER, 'vnfs', str(vnf_id)))
+            flash(f'The VNF has been successfully removed', 'info')
+        else:
+            flash(f'Forbidden - You don\'t have permission to remove this VNF', 'error')
+    else:
+        return render_template('errors/404.html'), 404
+    return redirect(url_for('main.vnf_repository'))
 
 
 @bp.route('/upload_VNF', methods=['GET', 'POST'])

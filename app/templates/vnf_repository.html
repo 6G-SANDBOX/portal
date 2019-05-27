@@ -9,6 +9,12 @@
     document.getElementById('navbar-home').classList.remove('menuSelected');
     document.getElementById('navbar-createExperiment').classList.remove('menuSelected');
 })();
+
+function confirmDelete(VNF_id){
+    if (window.confirm("Do you really want to remove the VNF?")) {
+        window.location.replace("/delete_VNF/"+VNF_id);
+    }
+}
 </script>
 {% endblock %}
 
@@ -16,12 +22,10 @@
 <div class="card">
     <div class = "panel panel-info">
         <div class="panel-heading" id="{{ card }}Header" style="padding: 0px !important">
-            <h2 class = "panel-title" >
-                <button class="btn btn-block btn-panel" type="button" data-toggle="collapse"
-                        data-target="#{{ card }}_VNF" aria-expanded="false" aria-controls="{{ card }}_VNF">
-                    <b>VNF:</b> {{ VNFInfo.name }}
-                </button>
-            </h2>
+            <button class="btn btn-panel" type="button" data-toggle="collapse" style="width: 100%;"
+                    data-target="#{{ card }}_VNF" aria-expanded="false" aria-controls="{{ card }}_VNF" >
+                <b>VNF:</b> {{ VNFInfo.name }}
+            </button>
         </div>
         <div id="{{ card }}_VNF" class="collapse" aria-labelledby="{{ card }}Header" data-parent="#{{ accordion }}">
             <div class="card-body">
