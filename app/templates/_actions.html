@@ -1,0 +1,7 @@
+<tr>
+    <td>
+        {{ moment(action.timestamp).format('DD MMMM YYYY, h:mm:ss') }}
+        <br>
+        {{ action.message|safe }}
+    </td>
+</tr>

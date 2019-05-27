@@ -1,5 +1,11 @@
 {% extends 'bootstrap/base.html' %}
 
+{% block scripts %}
+{{ super() }}
+{{ moment.include_jquery() }}
+{{ moment.include_moment() }}
+{% endblock %}
+
 <html>
 {% block title %}
 5GENESIS Portal

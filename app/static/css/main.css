@@ -5,6 +5,14 @@
     scrollbar-color: #a1daf8 #e7f6fd;
 }
 
+.actions-scrollbar {
+    position: relative;
+    height: 300px;
+    overflow: auto;
+    margin-top: 15px;
+    scrollbar-color: #a1daf8 #e7f6fd;
+}
+
 .div-wrapper-scrollbar{
     display: block;
 }
