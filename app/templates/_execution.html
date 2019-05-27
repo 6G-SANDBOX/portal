@@ -2,7 +2,7 @@
     <th scope="row" class="col-md-2">
         {{ execution.id }}
     </th>
-    <td class="col-md-2">
+    <td class="col-md-1">
         {% if execution.status == 'Init' %}
         <span class="label label-default">{{ execution.status }}</span>
         {% elif execution.status in ['PreRun', 'Run', 'PostRun'] %}
@@ -21,7 +21,12 @@
     <td class="col-md-3">
         {{ moment(execution.end_time).format('DD MMMM YYYY, h:mm:ss') }}
     </td>
-    <td class="col-md-2">
+    <td class="col-md-3">
         <a class="btn btn-darkBlue btn-sm" href="/execution/{{ execution.id }}" role="button">Execution Logs</a>
+        {% if grafana_url == None or not execution.dashboard_url %}
+        <a class="btn btn-primary btn-sm disabled" href="#" role="button">Results</a>
+        {% else %}
+        <a class="btn btn-blue btn-sm" href="{{ grafana_url }}{{ execution.dashboard_url }}" role="button" target="_blank">Results</a>
+        {% endif %}
     </td>
 </tr>

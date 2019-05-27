@@ -34,7 +34,7 @@ h4{
     color: #777777;
 }
 
-form > h4{
+form > h4, div > h4{
     color: #005b90 !important;
 }
 
@@ -105,4 +105,9 @@ th, td{
 
 .table {
     margin-bottom: 0px !important;
+}
+
+a.disable {
+  pointer-events: none;
+  cursor: default;
 }

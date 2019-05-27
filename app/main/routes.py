@@ -21,21 +21,7 @@ def index():
     config = Config()
     notices = config.Notices
     if formRun.validate_on_submit():
-        try:
-            api = Dispatcher_Api(config.Dispatcher.Host, config.Dispatcher.Port, "/api/v0")  # //api/v0
-            jsonresponse = api.Post(request.form['id'])
-            flash(f'Success: {jsonresponse["Success"]} - Execution Id: '
-                  f'{jsonresponse["ExecutionId"]} - Message: {jsonresponse["Message"]}', 'info')
-            execution = Execution(id=jsonresponse["ExecutionId"], experiment_id=request.form['id'], status='Init')
-            db.session.add(execution)
-            db.session.commit()
-            exp = Experiment.query.get(execution.experiment_id)
-            action = Action(timestamp=datetime.utcnow(), author=current_user,
-                            message=f'<a href="/execution/{execution.id}">Ran experiment: {exp.name}</a>')
-            db.session.add(action)
-            db.session.commit()
-        except Exception as e:
-            flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
+        runExperiment(config)
         return redirect(url_for('main.index'))
     actions = User.query.get(current_user.id).user_actions()
     return render_template('index.html', title='Home', formRun=formRun, experiments=experiments, notices=notices,
@@ -101,6 +87,11 @@ def new_experiment():
 @login_required
 def experiment(experiment_id):
     exp = Experiment.query.get(experiment_id)
+    formRun = RunExperimentForm()
+    config = Config()
+    if formRun.validate_on_submit():
+        runExperiment(config)
+        return redirect(request.url)
     if exp is None:
         flash(f'Experiment not found', 'error')
         return redirect(url_for('main.index'))
@@ -111,7 +102,8 @@ def experiment(experiment_id):
                 flash(f'The experiment {exp.name} doesn\'t have any executions yet', 'info')
                 return redirect(url_for('main.index'))
             else:
-                return render_template('experiment.html', title='Experiment', experiment=exp, executions=executions)
+                return render_template('experiment.html', title='Experiment', experiment=exp, executions=executions,
+                                       formRun=formRun, grafana_url=config.GrafanaUrl)
         else:
             flash(f'Forbidden - You don\'t have permission to access this experiment', 'error')
             return redirect(url_for('main.index'))
@@ -140,7 +132,8 @@ def execution(execution_id):
                     postRun = LogInfo(jsonresponse["PostRun"])
                     preRun = LogInfo(jsonresponse["PreRun"])
                     return render_template('execution.html', title='Execution', execution=exe, log_status=status,
-                                           executor=executor, postRun=postRun, preRun=preRun)
+                                           executor=executor, postRun=postRun, preRun=preRun, experiment=exp,
+                                           grafana_url=config.GrafanaUrl)
             except Exception as e:
                 flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
                 return experiment(exe.experiment_id)
@@ -213,3 +206,22 @@ def upload_VNF():
             return redirect(url_for('main.vnf_repository'))
         flash('There are files missing', 'error')
     return render_template('upload_VNF.html', title='Home', form=form)
+
+
+def runExperiment(config):
+    try:
+        api = Dispatcher_Api(config.Dispatcher.Host, config.Dispatcher.Port, "/api/v0")  # //api/v0
+        jsonresponse = api.Post(request.form['id'])
+        flash(f'Success: {jsonresponse["Success"]} - Execution Id: '
+              f'{jsonresponse["ExecutionId"]} - Message: {jsonresponse["Message"]}', 'info')
+        execution = Execution(id=jsonresponse["ExecutionId"], experiment_id=request.form['id'],
+                              status='Init')
+        db.session.add(execution)
+        db.session.commit()
+        exp = Experiment.query.get(execution.experiment_id)
+        action = Action(timestamp=datetime.utcnow(), author=current_user,
+                        message=f'<a href="/execution/{execution.id}">Ran experiment: {exp.name}</a>')
+        db.session.add(action)
+        db.session.commit()
+    except Exception as e:
+        flash(f'Exception while trying to connect with dispatcher: {e}', 'error')

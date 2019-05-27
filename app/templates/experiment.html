@@ -10,6 +10,12 @@
 <div style="padding: 5px 0 0 20px">
     <h4>· Type: {{ experiment.type }}</h4>
 </div>
+</br>
+<form id="formRun" method="post" novalidate>
+    {{ formRun.hidden_tag() }}
+    <input type="hidden" name="id" value="{{ experiment.id }}"/>
+    <button type="submit" name="submit" class="btn btn-darkBlue">Run Experiment</button>
+</form>
 
 <hr>
 <div style="text-align: center">
@@ -20,10 +26,10 @@
     <thead class="thead-dark">
     <tr>
         <th class="col-md-2">Execution ID</th>
-        <th class="col-md-2">Status</th>
+        <th class="col-md-1">Status</th>
         <th class="col-md-3">Start Time</th>
         <th class="col-md-3">End Time</th>
-        <th class="col-md-2">Action</th>
+        <th class="col-md-3">Action</th>
     </tr>
     </thead>
 </table>
