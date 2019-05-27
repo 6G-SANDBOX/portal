@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% import '_logView.html' as logView %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/log.css') }}">
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ logView.logScripts() }}
+{% endblock %}
+
+{% macro accordionCard(accordion, card, logInfo) %}
+{% set LogLevels = ['Debug', 'Info', 'Warning', 'Error', 'Critical'] %}
+<div class="card">
+    <div class = "panel panel-info">
+        {{ logView.logView(card, logInfo) }}
+    </div>
+</div>
+{% endmacro %}
+
+{% block app_content %}
+<div style="text-align: center">
+    <h2>Execution {{ execution.id }}</h2>
+</div>
+</br>
+<table class="table table-header">
+    <thead class="thead-dark">
+    <tr>
+        <th>Status</th>
+        <th>Start Time</th>
+        <th>End Time</th>
+        <th>Experiment</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="col-md-1">
+            {% if execution.status == 'Init' %}
+            <span class="label label-default">{{ execution.status }}</span>
+            {% elif execution.status in ['PreRun', 'Run', 'PostRun'] %}
+            <span class="label label-primary">{{ execution.status }}</span>
+            {% elif execution.status == 'Finished' %}
+            <span class="label label-success">{{ execution.status }}</span>
+            {% elif execution.status == 'Cancelled' %}
+            <span class="label label-warning">{{ execution.status }}</span>
+            {% elif execution.status == 'Errored' %}
+            <span class="label label-danger">{{ execution.status }}</span>
+            {% endif %}        </td>
+        </td>
+        <td class="col-md-4">
+            {{ execution.start_time }}
+        </td>
+        <td class="col-md-4">
+            {{ execution.end_time }}
+        </td>
+        <td class="col-md-1">
+            {{ execution.experiment_id }}
+        </td>
+    </tr>
+    </tbody>
+</table>
+<hr>
+</br>
+
+{{ accordionCard('logAccordion', 'Pre-Run', preRun) }}
+{{ accordionCard('logAccordion', 'Run', executor) }}
+{{ accordionCard('logAccordion', 'Post-Run', postRun) }}
+
+{% endblock %}

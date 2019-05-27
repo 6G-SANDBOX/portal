@@ -48,3 +48,7 @@ class Config:
     @property
     def Platform(self):
         return self.data['Platform']
+
+    @property
+    def Description(self):
+        return self.data['Description']

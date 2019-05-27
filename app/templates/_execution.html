@@ -1,5 +1,4 @@
 <tr>
-
     <th scope="row" class="col-md-2">
         {{ execution.id }}
     </th>
@@ -15,12 +14,14 @@
         {% elif execution.status == 'Errored' %}
         <span class="label label-danger">{{ execution.status }}</span>
         {% endif %}
-
     </td>
-    <td class="col-md-4">
+    <td class="col-md-3">
         {{ execution.start_time }}
     </td>
-    <td class="col-md-4">
+    <td class="col-md-3">
         {{ execution.end_time }}
+    </td>
+    <td class="col-md-2">
+        <a class="btn btn-darkBlue btn-sm" href="/execution/{{ execution.id }}" role="button">Execution Logs</a>
     </td>
 </tr>

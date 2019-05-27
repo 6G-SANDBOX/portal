@@ -14,3 +14,8 @@ class Dispatcher_Api(RestClient):
         response = self.HttpPost(url, {'Content-Type': 'application/json'},
                                  json.dumps(Experiment.query.get(experiment_id).serialization()))
         return RestClient.ResponseToJson(response)
+
+    def Get(self, execution_id):
+        url = f'{self.api_url}/{execution_id}/logs'
+        response = self.HttpGet(url)
+        return RestClient.ResponseToJson(response)

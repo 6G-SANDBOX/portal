@@ -6,6 +6,7 @@ from app.models import User
 from app.authentication import bp
 from app.authentication.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
 from app.authentication.email import send_password_reset_email
+from Helper import Config
 
 
 @bp.route('/register', methods=['GET', 'POST'])
@@ -20,7 +21,8 @@ def register():
         db.session.commit()
         flash('You have been registered', 'info')
         return redirect(url_for('authentication.login'))
-    return render_template('authentication/register.html', title='Register', form=form)
+    return render_template('authentication/register.html', title='Register', form=form,
+                           description=Config().Description)
 
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -38,7 +40,8 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('main.index')
         return redirect(next_page)
-    return render_template('authentication/login.html', title='Sign In', form=form)
+    return render_template('authentication/login.html', title='Sign In', form=form,
+                           description=Config().Description)
 
 
 @bp.route('/logout')
@@ -59,7 +62,7 @@ def reset_password_request():
         flash('Check your email for the instructions to reset your password', 'info')
         return redirect(url_for('authentication.login'))
     return render_template('authentication/reset_password_request.html',
-                           title='Reset Password', form=form)
+                           title='Reset Password', form=form, description=Config().Description)
 
 
 @bp.route('/reset_password/<token>', methods=['GET', 'POST'])
@@ -75,4 +78,4 @@ def reset_password(token):
         db.session.commit()
         flash('Your password has been reset.', 'info')
         return redirect(url_for('authentication.login'))
-    return render_template('authentication/reset_password.html', form=form)
+    return render_template('authentication/reset_password.html', form=form, description=Config().Description)

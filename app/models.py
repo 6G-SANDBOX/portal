@@ -3,7 +3,6 @@ from flask_login import UserMixin
 from app import db, login
 from time import time
 from flask import current_app
-from config import Config
 from sqlalchemy.types import TypeDecorator, VARCHAR
 import json
 import jwt
