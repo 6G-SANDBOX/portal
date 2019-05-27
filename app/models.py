@@ -46,6 +46,7 @@ class User(UserMixin, db.Model):
     organization = db.Column(db.String(32))
     experiments = db.relationship('Experiment', backref='author', lazy='dynamic')
     actions = db.relationship('Action', backref='author', lazy='dynamic')
+    VNFs = db.relationship('VNF', backref='author', lazy='dynamic')
 
     def __repr__(self):
         return f'<User: {self.id}, Username: {self.username}, Email: {self.email}, Organization: {self.organization}'
@@ -68,6 +69,10 @@ class User(UserMixin, db.Model):
     def user_actions(self):
         acts = Action.query.filter_by(user_id=self.id).order_by(Action.id.desc()).limit(10)
         return acts
+
+    def user_VNFs(self):
+        VNFs = VNF.query.filter_by(user_id=self.id).order_by(VNF.id)
+        return VNFs
 
     @staticmethod
     def verify_reset_password_token(token):
@@ -137,3 +142,18 @@ class Action(db.Model):
     def __repr__(self):
         return f'<Action {self.id}, Timestamp {self.timestamp}, Message {self.message}, ' \
             f'User {self.user_id}>'
+
+
+class VNF(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    description = db.Column(db.String(256))
+    VNFD = db.Column(db.String(256))
+    NDS = db.Column(db.String(256))
+    NST = db.Column(db.String(256))
+    image = db.Column(db.String(256))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    def __repr__(self):
+        return f'<VNF {self.id}, Name {self.name}, Description {self.description}, VNFD {self.VNFD}, NDS {self.NDS} ' \
+            f'NST {self.NST}, Image {self.image}, User {self.user_id}>'
