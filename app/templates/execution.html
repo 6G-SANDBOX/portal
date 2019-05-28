@@ -40,9 +40,9 @@
     <tr>
         <td>
             {% if execution.status == 'Init' %}
-            <span class="label label-default">{{ execution.status }}</span>
+            <span class="label label-default" id="table_status{{ execution.id }}">{{ execution.status }}</span>
             {% elif execution.status in ['PreRun', 'Run', 'PostRun'] %}
-            <span class="label label-primary">{{ execution.status }}</span>
+            <span class="label label-primary" id="table_status{{ execution.id }}">{{ execution.status }}</span>
             {% elif execution.status == 'Finished' %}
             <span class="label label-success">{{ execution.status }}</span>
             {% elif execution.status == 'Cancelled' %}
@@ -65,7 +65,8 @@
             {% if grafana_url == None or not execution.dashboard_url %}
             <a class="btn btn-primary btn-sm disabled" href="#" role="button">Results</a>
             {% else %}
-            <a class="btn btn-blue btn-sm" href="{{ grafana_url }}{{ execution.dashboard_url }}" role="button" target="_blank">Results</a>
+            <a class="btn btn-blue btn-sm" href="{{ grafana_url }}{{ execution.dashboard_url }}" role="button"
+               target="_blank">Results</a>
             {% endif %}
         </td>
     </tr>
