@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from flask_login import current_user, login_required
 from REST import Dispatcher_Api
 from app import db
@@ -8,7 +8,8 @@ from app.main.forms import ExperimentForm, RunExperimentForm, VNFForm
 from Helper import Config, LogInfo
 from datetime import datetime
 from werkzeug.utils import secure_filename
-import os, shutil
+import os
+import shutil
 from config import Config as UploaderConfig
 
 
@@ -87,6 +88,7 @@ def new_experiment():
                            ue_list=list_UEs, slice_list=Config().Slices, vnfs=vnfs, vnfs_id=vnfs_id)
 
 
+@bp.route('/experiment/<experiment_id>/reload', methods=['GET', 'POST'])
 @bp.route('/experiment/<experiment_id>', methods=['GET', 'POST'])
 @login_required
 def experiment(experiment_id):
@@ -95,7 +97,7 @@ def experiment(experiment_id):
     config = Config()
     if formRun.validate_on_submit():
         runExperiment(config)
-        return redirect(request.url)
+        return redirect(f"{request.url}/reload")
     if exp is None:
         flash(f'Experiment not found', 'error')
         return redirect(url_for('main.index'))
@@ -107,12 +109,13 @@ def experiment(experiment_id):
                 return redirect(url_for('main.index'))
             else:
                 return render_template('experiment.html', title='Experiment', experiment=exp, executions=executions,
-                                       formRun=formRun, grafana_url=config.GrafanaUrl)
+                                       formRun=formRun, grafana_url=config.GrafanaUrl, executionId=getLastExecution()+1)
         else:
             flash(f'Forbidden - You don\'t have permission to access this experiment', 'error')
             return redirect(url_for('main.index'))
 
 
+@bp.route('/execution/<execution_id>/reload', methods=['GET'])
 @bp.route('/execution/<execution_id>', methods=['GET'])
 @login_required
 def execution(execution_id):
@@ -137,7 +140,7 @@ def execution(execution_id):
                     preRun = LogInfo(jsonresponse["PreRun"])
                     return render_template('execution.html', title='Execution', execution=exe, log_status=status,
                                            executor=executor, postRun=postRun, preRun=preRun, experiment=exp,
-                                           grafana_url=config.GrafanaUrl)
+                                           grafana_url=config.GrafanaUrl, executionId=getLastExecution()+1)
             except Exception as e:
                 flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
                 return experiment(exe.experiment_id)
@@ -229,3 +232,26 @@ def runExperiment(config):
         db.session.commit()
     except Exception as e:
         flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
+
+
+@bp.route('/<int:executionId>/json')
+def json(executionId: int):
+    execution = Execution.query.get(executionId)
+    percent = 0
+    message = []
+    if execution is not None:
+        status = execution.status
+        percent = execution.percent
+        message = execution.message
+    return jsonify({
+        'Status': status, 'PerCent': percent, 'Message': message
+    })
+
+
+@bp.route('/nextExecutionId')
+def nextExecutionId():
+    return jsonify({'NextId': getLastExecution() + 1})
+
+
+def getLastExecution():
+    return db.session.query(Execution).order_by(Execution.id.desc()).first().id

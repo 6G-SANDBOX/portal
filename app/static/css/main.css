@@ -111,3 +111,8 @@ a.disable {
   pointer-events: none;
   cursor: default;
 }
+
+.bar{
+    background: #005b90;
+    margin-top: 5px;
+}
