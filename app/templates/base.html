@@ -15,6 +15,12 @@
 {{ super() }}
 <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<script src="{{ url_for('static', filename='js/nanobar.min.js') }}"></script>
+<script>
+    window.setTimeout(function() {
+        $(".alert_message").fadeTo(500, 0).slideUp(500, function(){ $(this).remove(); });
+    }, 4000);
+</script>
 {% endblock %}
 
 {% block navbar %}
@@ -29,10 +35,10 @@
                 <span class="icon-bar"></span>
             </button>
             {% if current_user.is_anonymous %}
-            <a href="{{ url_for('authentication.login') }}"><img src="../static/images/5genesis_transparent.png" alt="5Genesis" height="50" width="39" style="float: left; padding: 5px"></a>
+            <a href="{{ url_for('authentication.login') }}"><img src=" {{ url_for('static', filename='images/5genesis_transparent.png') }} " alt="5Genesis" height="50" width="39" style="float: left; padding: 5px"></a>
             <a class="navbar-brand" href="{{ url_for('authentication.login') }}">5Genesis</a>
             {% else %}
-            <a href="{{ url_for('main.index') }}"><img src="../static/images/5genesis_transparent.png" alt="5Genesis" height="50" width="39" style="float: left; padding: 5px"></a>
+            <a href="{{ url_for('main.index') }}"><img src="{{ url_for('static', filename='images/5genesis_transparent.png') }}" alt="5Genesis" height="50" width="39" style="float: left; padding: 5px"></a>
             <a class="navbar-brand" href="{{ url_for('main.index') }}">5Genesis</a>
             {% endif %}
         </div>
@@ -63,9 +69,9 @@
     {% if messages %}
     {% for category, message in messages %}
     {% if category == 'error' %}
-    <div class="alert alert-danger" role="alert">{{ message }}</div>
+    <div class="alert alert-danger alert_message" role="alert">{{ message }}</div>
     {% else %}
-    <div class="alert alert-info" role="alert">{{ message }}</div>
+    <div class="alert alert-info alert_message" role="alert">{{ message }}</div>
     {% endif %}
     {% endfor %}
     {% endif %}
