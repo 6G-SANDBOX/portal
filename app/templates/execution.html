@@ -11,19 +11,6 @@
 {{ super() }}
 <script src="{{url_for('static', filename='js/updateExecutionStatus.js')}}"></script>
 {{ logView.logScripts() }}
-<script>
-function checkNewExecutions(){
-    let current = $('#hiddenNextId').text();
-    $.get("{{ url_for('main.nextExecutionId') }}")
-        .done(function (response){
-            if (response['NextId'].toString() !== current){
-                location.reload();
-            }
-        }
-    );
-}
-setInterval(checkNewExecutions, 5000)
-</script>
 
 {% if execution.status not in ['Finished', 'Cancelled', 'Errored'] %}
 <script>
@@ -71,7 +58,6 @@ update{{ execution.id }}(nanobar);
 <div style="text-align: center">
     <h2>Execution {{ execution.id }}</h2>
 </div>
-<p id="hiddenNextId" style="display: none">{{ executionId }}</p>
 <div class="opaque" hidden></div>
 <div class="loader" hidden></div>
 <table class="table table-header">
