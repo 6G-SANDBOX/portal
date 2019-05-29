@@ -25,7 +25,11 @@
         {{ moment(execution.end_time).format('DD MMMM YYYY, h:mm:ss') }}
     </td>
     <td class="col-md-3">
+        {% if execution.status not in ['Finished', 'Cancelled', 'Errored'] %}
         <a class="btn btn-darkBlue btn-sm" href="/execution/{{ execution.id }}/reloadLog" role="button">Execution Logs</a>
+        {% else %}
+        <a class="btn btn-darkBlue btn-sm" href="/execution/{{ execution.id }}" role="button">Execution Logs</a>
+        {% endif %}
         {% if grafana_url == None or not execution.dashboard_url %}
         <a class="btn btn-primary btn-sm disabled" href="#" role="button">Results</a>
         {% else %}
