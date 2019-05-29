@@ -115,7 +115,7 @@ def experiment(experiment_id):
             return redirect(url_for('main.index'))
 
 
-@bp.route('/execution/<execution_id>/reload', methods=['GET'])
+@bp.route('/execution/<execution_id>/reloadLog', methods=['GET'])
 @bp.route('/execution/<execution_id>', methods=['GET'])
 @login_required
 def execution(execution_id):

@@ -25,9 +25,10 @@ function update{{ exe.id }}(nanobar) {
         .done(function (response) {
             if (response['Status'] === 'Finished'){
                 updateOne($("#table_status{{ exe.id }}"), response['Status']);
-                $(".{{ exe.id }}div").fadeTo(500, 0).slideUp(500, function(){ $(this).remove(); });
+                $("#table_status{{ exe.id }}").addClass("label-success");
+                $("#table_status{{ exe.id }}").removeClass("label-primary");
+                $("#progress{{ exe.id }}").fadeTo(500, 0).slideUp(500, function(){ $(this).remove(); });
             } else {
-                updateOne($("#status{{ exe.id }}"), response['Status']);
                 updateOne($("#table_status{{ exe.id }}"), response['Status']);
                 updatePerCent(nanobar, response['PerCent'], $('#percent{{ exe.id }}'));
                 updateMessage($('#message{{ exe.id }}'), response['Message']);
@@ -69,24 +70,15 @@ update{{ exe.id }}(nanobar);
 </div>
 </br>
 <p id="hiddenNextId" style="display: none">{{ executionId }}</p>
-{% for exe in executions %}
-{% if exe.status not in ['Finished', 'Cancelled', 'Errored'] %}
-<div class="{{ exe.id }}div alert alert-info" role="alert" style="width: 400px">
-    <span>Execution {{ exe.id }}:</span>
-    <span id="status{{ exe.id }}" style="font-weight: bold">{{ exe.status }}</span>
-    </br>
-    <span id="progress{{ exe.id }}"></span>
-</div>
-</br>
-{% endif %}
-{% endfor %}
+<div class="opaque" hidden></div>
+<div class="loader" hidden></div>
 <table class="table table-striped table-header">
     <thead class="thead-dark">
     <tr>
         <th class="col-md-2">Execution ID</th>
-        <th class="col-md-1">Status</th>
-        <th class="col-md-3">Start Time</th>
-        <th class="col-md-3">End Time</th>
+        <th class="col-md-3">Status</th>
+        <th class="col-md-2">Start Time</th>
+        <th class="col-md-2">End Time</th>
         <th class="col-md-3">Action</th>
     </tr>
     </thead>

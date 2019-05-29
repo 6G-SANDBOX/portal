@@ -32,9 +32,10 @@ function update{{ execution.id }}(nanobar) {
         .done(function (response) {
             if (response['Status'] === 'Finished'){
                 updateOne($("#table_status{{ execution.id }}"), response['Status']);
-                $(".{{ execution.id }}div").fadeTo(500, 0).slideUp(500, function(){ $(this).remove(); });
+                $("#table_status{{ execution.id }}").addClass("label-success");
+                $("#table_status{{ execution.id }}").removeClass("label-primary");
+                $("#progress{{ execution.id }}").fadeTo(500, 0).slideUp(500, function(){ $(this).remove(); });
             } else {
-                updateOne($("#status{{ execution.id }}"), response['Status']);
                 updateOne($("#table_status{{ execution.id }}"), response['Status']);
                 updatePerCent(nanobar, response['PerCent'], $('#percent{{ execution.id }}'));
                 updateMessage($('#message{{ execution.id }}'), response['Message']);
@@ -71,15 +72,8 @@ update{{ execution.id }}(nanobar);
     <h2>Execution {{ execution.id }}</h2>
 </div>
 <p id="hiddenNextId" style="display: none">{{ executionId }}</p>
-{% if execution.status not in ['Finished', 'Cancelled', 'Errored'] %}
-<div class="{{ execution.id }}div alert alert-info" role="alert" style="width: 400px">
-    <span>Execution {{ execution.id }}:</span>
-    <span id="status{{ execution.id }}" style="font-weight: bold">{{ execution.status }}</span>
-    </br>
-    <span id="progress{{ execution.id }}"></span>
-</div>
-</br>
-{% endif %}
+<div class="opaque" hidden></div>
+<div class="loader" hidden></div>
 <table class="table table-header">
     <thead class="thead-dark">
     <tr>
@@ -92,7 +86,7 @@ update{{ execution.id }}(nanobar);
     </thead>
     <tbody>
     <tr>
-        <td>
+        <td class="col-md-3">
             {% if execution.status == 'Init' %}
             <span class="label label-default" id="table_status{{ execution.id }}">{{ execution.status }}</span>
             {% elif execution.status in ['PreRun', 'Run', 'PostRun'] %}
@@ -104,18 +98,20 @@ update{{ execution.id }}(nanobar);
             {% elif execution.status == 'Errored' %}
             <span class="label label-danger">{{ execution.status }}</span>
             {% endif %}
+            {% if execution.status not in ['Finished', 'Cancelled', 'Errored'] %}
+            <span id="progress{{ execution.id }}"></span>
+            {% endif %}
         </td>
-        </td>
-        <td>
+        <td class="col-md-2">
             {{ moment(execution.start_time).format('DD MMMM YYYY, h:mm:ss') }}
         </td>
-        <td>
+        <td class="col-md-2">
             {{ moment(execution.end_time).format('DD MMMM YYYY, h:mm:ss') }}
         </td>
-        <td>
+        <td class="col-md-3">
             {{ experiment.name }}
         </td>
-        <td>
+        <td class="col-md-2">
             {% if grafana_url == None or not execution.dashboard_url %}
             <a class="btn btn-primary btn-sm disabled" href="#" role="button">Results</a>
             {% else %}
