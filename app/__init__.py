@@ -9,6 +9,8 @@ from config import Config
 from flask_moment import Moment
 import os
 import logging
+from Helper import Log
+
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -31,6 +33,7 @@ def create_app(config_class=Config):
     bootstrap.init_app(app)
     mail.init_app(app)
     moment.init_app(app)
+    Log.Initialize(app)
 
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
@@ -44,19 +47,7 @@ def create_app(config_class=Config):
     from app.api import bp as api_bp
     app.register_blueprint(api_bp, url_prefix='/api')
 
-    if not app.debug:
-        if not os.path.exists('logs'):
-            os.mkdir('logs')
-        file_handler = RotatingFileHandler('logs/5genesis.log', maxBytes=1024000,
-                                           backupCount=10)
-        file_handler.setFormatter(logging.Formatter(
-            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
-        file_handler.setLevel(logging.INFO)
-        app.logger.addHandler(file_handler)
-
-        app.logger.setLevel(logging.INFO)
-        app.logger.info('5Genesis startup')
-
+    Log.I('5Genesis startup')
     return app
 
 

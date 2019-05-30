@@ -21,3 +21,8 @@ Platform:
 
 Description:
   5th Generation End-to-end Network, Experimentation, System Integration, and Showcasing
+
+Logging:
+  Folder: 'Logs'
+  AppLevel: INFO
+  LogLevel: DEBUG
