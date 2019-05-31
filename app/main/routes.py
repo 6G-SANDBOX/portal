@@ -5,7 +5,7 @@ from app import db
 from app.main import bp
 from app.models import User, Experiment, Execution, Action, VNF, VNFLocation
 from app.main.forms import ExperimentForm, RunExperimentForm, VNFForm
-from Helper import Config, LogInfo
+from Helper import Config, LogInfo, Log
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import os
@@ -46,7 +46,10 @@ def new_experiment():
         if not test_cases_selected:
             flash(f'Please, select at least one Test Case', 'error')
             return redirect(url_for('main.new_experiment'))
-        
+
+        Log.D(f'Create experiment form data - Name: {form.name.data}, Type: {form.type.data}'
+              f', TestCases {test_cases_selected}, UEs: {ues_selected}, Slice: {request.form.get("slice", None)}')
+
         experiment = Experiment(name=form.name.data, author=current_user, unattended=True, type=form.type.data,
                                 test_cases=test_cases_selected, ues=ues_selected)
         form_slice=request.form.get('slice', None)
@@ -55,6 +58,8 @@ def new_experiment():
 
         db.session.add(experiment)
         db.session.commit()
+        Log.I(f'Added experiment {experiment.id}')
+
         if 'vnf_count' in request.form:
             count = int(request.form['vnf_count'])
         else:
@@ -63,8 +68,10 @@ def new_experiment():
             loc='location'+str(i+1)
             vnf='VNF'+str(i+1)
             vnf_loc = VNFLocation(location=request.form[loc], VNF_id=request.form[vnf], experiment_id=experiment.id)
+            Log.D(f'Selected VNF {request.form[vnf]} with location {request.form[loc]}')
             db.session.add(vnf_loc)
             db.session.commit()
+            Log.I(f'Added VNF-Location {vnf_loc.id} to Experiment {experiment.id}')
 
         baseFolder = os.path.join(UploaderConfig.UPLOAD_FOLDER, 'experiment', str(experiment.id))
         os.makedirs(os.path.join(baseFolder, "nsd"), mode=0o755, exist_ok=True)
@@ -77,11 +84,13 @@ def new_experiment():
                 experiment.NSD = fileNSD_name
                 db.session.add(experiment)
                 db.session.commit()
+                Log.I(f'Added NSD file {fileNSD_name} to Experiment {experiment.id}')
         
         action = Action(timestamp=datetime.utcnow(), author=current_user,
                         message=f'<a href="/experiment/{experiment.id}">Created experiment: {form.name.data}</a>')
         db.session.add(action)
         db.session.commit()
+        Log.I(f'Added action - Created experiment')
         flash('Your experiment has been successfully created', 'info')
         return redirect(url_for('main.index'))
     return render_template('new_experiment.html', title='Home', form=form, test_case_list=Config().TestCases,
@@ -99,6 +108,7 @@ def experiment(experiment_id):
         runExperiment(config)
         return redirect(f"{request.url}/reload")
     if exp is None:
+        Log.E(f'Experiment not found')
         flash(f'Experiment not found', 'error')
         return redirect(url_for('main.index'))
     else:
@@ -111,6 +121,7 @@ def experiment(experiment_id):
                 return render_template('experiment.html', title='Experiment', experiment=exp, executions=executions,
                                        formRun=formRun, grafana_url=config.GrafanaUrl, executionId=getLastExecution()+1)
         else:
+            Log.E(f'Forbidden - User {current_user.name} don\'t have permission to access experiment {experiment_id}')
             flash(f'Forbidden - You don\'t have permission to access this experiment', 'error')
             return redirect(url_for('main.index'))
 
@@ -121,6 +132,7 @@ def experiment(experiment_id):
 def execution(execution_id):
     exe = Execution.query.get(execution_id)
     if exe is None:
+        Log.E(f'Execution not found')
         flash(f'Execution not found', 'error')
         return redirect(url_for('main.index'))
     else:
@@ -130,8 +142,10 @@ def execution(execution_id):
                 config = Config()
                 api = Dispatcher_Api(config.Dispatcher.Host, config.Dispatcher.Port, "/experiment")
                 jsonresponse = api.Get(execution_id)
+                Log.D(f'Access exeuction logs response {jsonresponse}')
                 status = jsonresponse["Status"]
                 if status == 'Not Found':
+                    Log.E(f'Execution not found')
                     flash(f'Execution not found', 'error')
                     return redirect(url_for('main.index'))
                 else:
@@ -142,9 +156,11 @@ def execution(execution_id):
                                            executor=executor, postRun=postRun, preRun=preRun, experiment=exp,
                                            grafana_url=config.GrafanaUrl, executionId=getLastExecution()+1)
             except Exception as e:
+                Log.E(f'Error accessing execution{exe.experiment_id}: {e}')
                 flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
                 return experiment(exe.experiment_id)
         else:
+            Log.E(f'Forbidden - User {current_user.name} don\'t have permission to access execution{execution_id}')
             flash(f'Forbidden - You don\'t have permission to access this execution', 'error')
             return redirect(url_for('main.index'))
 
@@ -165,8 +181,10 @@ def delete_VNF(vnf_id):
             db.session.delete(vnf)
             db.session.commit()
             shutil.rmtree(os.path.join(UploaderConfig.UPLOAD_FOLDER, 'vnfs', str(vnf_id)))
+            Log.I(f'VNF {vnf_id} successfully removed')
             flash(f'The VNF has been successfully removed', 'info')
         else:
+            Log.E(f'Forbidden - User {current_user.name} don\'t have permission to remove VNF {vnf_id}')
             flash(f'Forbidden - You don\'t have permission to remove this VNF', 'error')
     else:
         return render_template('errors/404.html'), 404
@@ -179,6 +197,7 @@ def upload_VNF():
     form = VNFForm()
     if form.validate_on_submit():
         if 'fileVNFD' not in request.files or 'fileImage' not in request.files:
+            Log.E('Can\'t upload VNF. There are files missing')
             flash('There are files missing', 'error')
             return redirect(request.url)
 
@@ -193,13 +212,18 @@ def upload_VNF():
             fileVNFD_name = secure_filename(fileVNFD.filename)
             fileImage_name = secure_filename(fileImage.filename)
 
+            Log.D(f'Upload VNF form data - Name: {form.name.data}, Description: {form.description.data}'
+                  f', VNFD {fileVNFD_name}, image: {fileImage_name}')
+
             new_VNF = VNF(name=form.name.data, author=current_user, description=form.description.data,
                           VNFD=fileVNFD_name, image=fileImage_name)
+
             db.session.add(new_VNF)
             db.session.commit()
-
+            Log.I(f'Added VNF {new_VNF.name}')
             action = Action(timestamp=datetime.utcnow(), author=current_user,
                             message=f'<a href="/vnf_repository">Uploaded VNF: {new_VNF.name}</a>')
+            Log.I(f'Added action - Uploaded VNF')
             db.session.add(action)
             db.session.commit()
 
@@ -207,10 +231,13 @@ def upload_VNF():
             os.makedirs(os.path.join(baseFolder, "vnfd"), mode=0o755, exist_ok=True)
             os.makedirs(os.path.join(baseFolder, "images"), mode=0o755, exist_ok=True)
             fileVNFD.save(os.path.join(baseFolder, "vnfd", fileVNFD_name))
+            Log.D(f'Saved VNFD file {fileVNFD_name} in VNF {new_VNF.id}')
             fileImage.save(os.path.join(baseFolder, "images", fileImage_name))
+            Log.D(f'Saved Image file {fileImage_name} in VNF {new_VNF.id}')
 
             flash('Your VNF has been successfully uploaded', 'info')
             return redirect(url_for('main.vnf_repository'))
+        Log.E('Can\'t upload VNF. There are files missing')
         flash('There are files missing', 'error')
     return render_template('upload_VNF.html', title='Home', form=form)
 
@@ -219,18 +246,23 @@ def runExperiment(config):
     try:
         api = Dispatcher_Api(config.Dispatcher.Host, config.Dispatcher.Port, "/api/v0")  # //api/v0
         jsonresponse = api.Post(request.form['id'])
+        Log.D(f'Ran Experiment response {jsonresponse}')
+        Log.I(f'Ran Experiment {request.form["id"]}')
         flash(f'Success: {jsonresponse["Success"]} - Execution Id: '
               f'{jsonresponse["ExecutionId"]} - Message: {jsonresponse["Message"]}', 'info')
         execution = Execution(id=jsonresponse["ExecutionId"], experiment_id=request.form['id'],
                               status='Init')
         db.session.add(execution)
         db.session.commit()
+        Log.I(f'Added execution {jsonresponse["ExecutionId"]}')
         exp = Experiment.query.get(execution.experiment_id)
         action = Action(timestamp=datetime.utcnow(), author=current_user,
                         message=f'<a href="/execution/{execution.id}">Ran experiment: {exp.name}</a>')
         db.session.add(action)
         db.session.commit()
+        Log.I(f'Added action - Ran experiment')
     except Exception as e:
+        Log.E(f'Error running expermient: {e}')
         flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
 
 
@@ -250,6 +282,7 @@ def json(executionId: int):
 
 @bp.route('/nextExecutionId')
 def nextExecutionId():
+    Log.D(f'Next execution ID: {getLastExecution() + 1}')
     return jsonify({'NextId': getLastExecution() + 1})
 
 

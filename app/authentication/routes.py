@@ -6,7 +6,7 @@ from app.models import User
 from app.authentication import bp
 from app.authentication.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
 from app.authentication.email import send_password_reset_email
-from Helper import Config
+from Helper import Config, Log
 
 
 @bp.route('/register', methods=['GET', 'POST'])
@@ -15,11 +15,14 @@ def register():
         return redirect(url_for('main.index'))
     form = RegistrationForm()
     if form.validate_on_submit():
+        Log.D(f'Registration form data - Username: {form.username.data}, Email: {form.email.data},'
+              f' Organization: {form.organization.data}')
         user = User(username=form.username.data, email=form.email.data, organization=form.organization.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
         flash('You have been registered', 'info')
+        Log.I(f'Registered user: {user.username}')
         return redirect(url_for('authentication.login'))
     return render_template('authentication/register.html', title='Register', form=form,
                            description=Config().Description)
@@ -28,14 +31,17 @@ def register():
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
+        Log.W(f'The user is already authenticated')
         return redirect(url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
+            Log.E(f'Invalid username or password')
             flash('Invalid username or password', 'error')
             return redirect(url_for('authentication.login'))
         login_user(user, remember=form.remember_me.data)
+        Log.I(f'User {user.username} logged in')
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('main.index')
@@ -47,6 +53,7 @@ def login():
 @bp.route('/logout')
 def logout():
     logout_user()
+    Log.I(f'User logged out')
     return redirect(url_for('main.index'))
 
 
@@ -68,14 +75,17 @@ def reset_password_request():
 @bp.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     if current_user.is_authenticated:
+        Log.W(f'The user is already authenticated')
         return redirect(url_for('main.index'))
     user = User.verify_reset_password_token(token)
     if not user:
+        Log.W(f'Reset password token do not match any user')
         return redirect(url_for('main.index'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user.set_password(form.password.data)
         db.session.commit()
         flash('Your password has been reset.', 'info')
+        Log.I(f'Password reset for {user.name}')
         return redirect(url_for('authentication.login'))
     return render_template('authentication/reset_password.html', form=form, description=Config().Description)
