@@ -1,7 +1,8 @@
 from typing import Dict
-from os.path import exists
+from os.path import exists, abspath
 from shutil import copy
 import yaml
+import logging
 
 
 class Dispatcher:
@@ -15,6 +16,31 @@ class Dispatcher:
     @property
     def Port(self):
         return self.data['Port']
+
+
+class Logging:
+    def __init__(self, data: Dict):
+        self.data = data['Logging']
+
+    @staticmethod
+    def toLogLevel(level: str) -> int:
+        if level.lower() == 'critical': return logging.CRITICAL
+        if level.lower() == 'error': return logging.ERROR
+        if level.lower() == 'warning': return logging.WARNING
+        if level.lower() == 'info': return logging.INFO
+        return logging.DEBUG
+
+    @property
+    def Folder(self):
+        return abspath(self.data['Folder'])
+
+    @property
+    def AppLevel(self):
+        return self.toLogLevel(self.data['AppLevel'])
+
+    @property
+    def LogLevel(self):
+        return self.toLogLevel(self.data['LogLevel'])
 
 
 class Config:
@@ -69,3 +95,7 @@ class Config:
     @property
     def GrafanaUrl(self):
         return self.data['Grafana URL']
+
+    @property
+    def Logging(self):
+        return Logging(self.data)
