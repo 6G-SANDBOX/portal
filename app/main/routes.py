@@ -35,7 +35,7 @@ def new_experiment():
     list_UEs = list(Config().UEs.keys())
     vnfs = []
     vnfs_id = []
-    if not current_user.user_VNFs():
+    if current_user.user_VNFs():
         for vnf in current_user.user_VNFs():
             vnfs.append(vnf.name)
             vnfs_id.append(vnf.id)
