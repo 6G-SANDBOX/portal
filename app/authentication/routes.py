@@ -31,13 +31,13 @@ def register():
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        Log.W(f'The user is already authenticated')
+        Log.I(f'The user is already authenticated')
         return redirect(url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
-            Log.E(f'Invalid username or password')
+            Log.I(f'Invalid username or password')
             flash('Invalid username or password', 'error')
             return redirect(url_for('authentication.login'))
         login_user(user, remember=form.remember_me.data)
@@ -75,11 +75,11 @@ def reset_password_request():
 @bp.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     if current_user.is_authenticated:
-        Log.W(f'The user is already authenticated')
+        Log.I(f'The user is already authenticated')
         return redirect(url_for('main.index'))
     user = User.verify_reset_password_token(token)
     if not user:
-        Log.W(f'Reset password token do not match any user')
+        Log.I(f'Reset password token do not match any user')
         return redirect(url_for('main.index'))
     form = ResetPasswordForm()
     if form.validate_on_submit():

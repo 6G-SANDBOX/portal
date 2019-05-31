@@ -108,7 +108,7 @@ def experiment(experiment_id):
         runExperiment(config)
         return redirect(f"{request.url}/reload")
     if exp is None:
-        Log.E(f'Experiment not found')
+        Log.I(f'Experiment not found')
         flash(f'Experiment not found', 'error')
         return redirect(url_for('main.index'))
     else:
@@ -121,7 +121,7 @@ def experiment(experiment_id):
                 return render_template('experiment.html', title='Experiment', experiment=exp, executions=executions,
                                        formRun=formRun, grafana_url=config.GrafanaUrl, executionId=getLastExecution()+1)
         else:
-            Log.E(f'Forbidden - User {current_user.name} don\'t have permission to access experiment {experiment_id}')
+            Log.I(f'Forbidden - User {current_user.name} don\'t have permission to access experiment {experiment_id}')
             flash(f'Forbidden - You don\'t have permission to access this experiment', 'error')
             return redirect(url_for('main.index'))
 
@@ -132,7 +132,7 @@ def experiment(experiment_id):
 def execution(execution_id):
     exe = Execution.query.get(execution_id)
     if exe is None:
-        Log.E(f'Execution not found')
+        Log.I(f'Execution not found')
         flash(f'Execution not found', 'error')
         return redirect(url_for('main.index'))
     else:
@@ -145,7 +145,7 @@ def execution(execution_id):
                 Log.D(f'Access exeuction logs response {jsonresponse}')
                 status = jsonresponse["Status"]
                 if status == 'Not Found':
-                    Log.E(f'Execution not found')
+                    Log.I(f'Execution not found')
                     flash(f'Execution not found', 'error')
                     return redirect(url_for('main.index'))
                 else:
@@ -160,7 +160,7 @@ def execution(execution_id):
                 flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
                 return experiment(exe.experiment_id)
         else:
-            Log.E(f'Forbidden - User {current_user.name} don\'t have permission to access execution{execution_id}')
+            Log.I(f'Forbidden - User {current_user.name} don\'t have permission to access execution{execution_id}')
             flash(f'Forbidden - You don\'t have permission to access this execution', 'error')
             return redirect(url_for('main.index'))
 
@@ -184,7 +184,7 @@ def delete_VNF(vnf_id):
             Log.I(f'VNF {vnf_id} successfully removed')
             flash(f'The VNF has been successfully removed', 'info')
         else:
-            Log.E(f'Forbidden - User {current_user.name} don\'t have permission to remove VNF {vnf_id}')
+            Log.I(f'Forbidden - User {current_user.name} don\'t have permission to remove VNF {vnf_id}')
             flash(f'Forbidden - You don\'t have permission to remove this VNF', 'error')
     else:
         return render_template('errors/404.html'), 404
@@ -197,7 +197,7 @@ def upload_VNF():
     form = VNFForm()
     if form.validate_on_submit():
         if 'fileVNFD' not in request.files or 'fileImage' not in request.files:
-            Log.E('Can\'t upload VNF. There are files missing')
+            Log.I('Can\'t upload VNF. There are files missing')
             flash('There are files missing', 'error')
             return redirect(request.url)
 
@@ -237,7 +237,7 @@ def upload_VNF():
 
             flash('Your VNF has been successfully uploaded', 'info')
             return redirect(url_for('main.vnf_repository'))
-        Log.E('Can\'t upload VNF. There are files missing')
+        Log.I('Can\'t upload VNF. There are files missing')
         flash('There are files missing', 'error')
     return render_template('upload_VNF.html', title='Home', form=form)
 

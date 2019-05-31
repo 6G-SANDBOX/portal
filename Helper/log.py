@@ -87,43 +87,43 @@ class Log:
         cls.initialized = True
 
     @classmethod
-    def _dump(cls, level: str, msg: str, logger: Optional[str] = None):
+    def _dump(cls, level: str, msg: str):
         if cls.initialized:
-            log = cls.app.logger if logger is None else logging.getLogger(logger)
+            log = cls.app.logger
             method = getattr(log, level.lower())
             method(msg)
         else:
             print(f"[Log not initialized][{level}] {msg}")
 
     @classmethod
-    def D(cls, msg, logger: Optional[str] = None): cls._dump('DEBUG', msg, logger)
+    def D(cls, msg): cls._dump('DEBUG', msg)
 
     @classmethod
-    def I(cls, msg, logger: Optional[str] = None): cls._dump('INFO', msg, logger)
+    def I(cls, msg): cls._dump('INFO', msg)
 
     @classmethod
-    def W(cls, msg, logger: Optional[str] = None): cls._dump('WARNING', msg, logger)
+    def W(cls, msg): cls._dump('WARNING', msg)
 
     @classmethod
-    def E(cls, msg, logger: Optional[str] = None): cls._dump('ERROR', msg, logger)
+    def E(cls, msg): cls._dump('ERROR', msg)
 
     @classmethod
-    def C(cls, msg, logger: Optional[str] = None): cls._dump('CRITICAL', msg, logger)
+    def C(cls, msg): cls._dump('CRITICAL', msg)
 
     @staticmethod
     def State(condition: bool) -> str:
         return f'{"En" if condition else "Dis"}abled'
 
     @classmethod
-    def Log(cls, level: Union[Level, str], msg: str, logger: Optional[str] = None):
+    def Log(cls, level: Union[Level, str], msg: str):
         if isinstance(level, str):
             level = Level[level]
 
-        if level == Level.DEBUG: cls.D(msg, logger)
-        if level == Level.INFO: cls.I(msg, logger)
-        if level == Level.WARNING: cls.W(msg, logger)
-        if level == Level.ERROR: cls.E(msg, logger)
-        if level == Level.CRITICAL: cls.C(msg, logger)
+        if level == Level.DEBUG: cls.D(msg)
+        if level == Level.INFO: cls.I(msg)
+        if level == Level.WARNING: cls.W(msg)
+        if level == Level.ERROR: cls.E(msg)
+        if level == Level.CRITICAL: cls.C(msg)
 
     @classmethod
     def Traceback(cls, info):
