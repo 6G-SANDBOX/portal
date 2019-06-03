@@ -77,6 +77,7 @@ The environment variables that can be set are:
 * SECRET_KEY: **Set this value to a RANDOM string** (the default value is not random enough). See [this answer](https://stackoverflow.com/a/22463969).
 * FLASK_RUN_PORT: Port where the portal will listen (5000 by default)
 * SQLALCHEMY_DATABASE_URI: Database instance that will be used by the Portal. Depending on the backend it's possible that additional Python packages will need to be installed, for example, MySQL requires `pymysql`. See [Dialects](https://docs.sqlalchemy.org/en/latest/dialects/index.html)
+* UPLOAD_FOLDER: Folder path where the uploaded files will be stored.
 > Currently unused:
 > * MAIL_SERVER: Mail server location (localhost by default)
 > * MAIL_PORT: Mail server port (8025 by default)
@@ -93,7 +94,10 @@ ID of the UE, while the value contains a dictionary with extra data about the UE
 > The list of TestCases and UEs selected for each experiment will be sent to the Dispatcher (and ELCM) on every 
 execution request. The ELCM uses these values in order to customize the campaign execution (via the Composer and the 
 Facility Registry). This functionality is no yet included in the ELCM (as of 22/03/2019).
-
+* Slices: List of available Network Slices.
+* Grafana URL: Base URL of Grafana Dashboard to display Execution results.
+* Description: Description of the platform.
+* Logging: Parameters for storing application logs.
 ## Authors
 
 * **Gonzalo Chica Morales**
