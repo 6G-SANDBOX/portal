@@ -2,9 +2,12 @@
 
 ## Requirements
 
-[Python 3.7.x](https://www.python.org)
+ - [Python 3.7.x](https://www.python.org)
+ - [Optional] [Grafana](https://grafana.com/) (tested on version 5.4)
 
 ## Installing (development)
+> A video detailing the deployment procedure of the Portal (and ELCM) can be seen [in BSCW](https://bscw.fokus.fraunhofer.de/bscw/bscw.cgi/d3208170/Coordinationlayer_call20190422.mp4)
+
 > It is recommended, but not required, to run the Portal in a [Python virtual environment](https://virtualenv.pypa.io/en/stable/).
 > If you are not using virtual environments, skip steps 3 and 4.
 
@@ -78,6 +81,7 @@ The environment variables that can be set are:
 * FLASK_RUN_PORT: Port where the portal will listen (5000 by default)
 * SQLALCHEMY_DATABASE_URI: Database instance that will be used by the Portal. Depending on the backend it's possible that additional Python packages will need to be installed, for example, MySQL requires `pymysql`. See [Dialects](https://docs.sqlalchemy.org/en/latest/dialects/index.html)
 * UPLOAD_FOLDER: Folder path where the uploaded files will be stored.
+
 > Currently unused:
 > * MAIL_SERVER: Mail server location (localhost by default)
 > * MAIL_PORT: Mail server port (8025 by default)
@@ -93,11 +97,29 @@ The values that can be configured on `config.yml` are:
 ID of the UE, while the value contains a dictionary with extra data about the UE (currently the operating system).
 > The list of TestCases and UEs selected for each experiment will be sent to the Dispatcher (and ELCM) on every 
 execution request. The ELCM uses these values in order to customize the campaign execution (via the Composer and the 
-Facility Registry). This functionality is no yet included in the ELCM (as of 22/03/2019).
+Facility Registry).
 * Slices: List of available Network Slices.
+> This information is not currently used by the ELCM (as of 3/6/2019)
 * Grafana URL: Base URL of Grafana Dashboard to display Execution results.
 * Description: Description of the platform.
 * Logging: Parameters for storing application logs.
+
+### Portal Notices
+
+It's possible to display system-wide notices in the Portal by including a file named `notices.yml` in the root folder.
+The format of this file is as follows:
+
+```yaml
+Notices:
+  - Example notice 1
+  - Example notice 2
+```
+The list may include as many notices as necessary.
+
+### REST API
+
+Information about the current REST API of the Portal (and ELCM) can be seen [in BSCW](https://bscw.fokus.fraunhofer.de/bscw/bscw.cgi/d3228781/OpenAPIv1.docx).
+
 ## Authors
 
 * **Gonzalo Chica Morales**
