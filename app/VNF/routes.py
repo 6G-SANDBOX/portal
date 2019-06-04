@@ -1,15 +1,15 @@
 import os
 import shutil
+from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_required
+from werkzeug.utils import secure_filename
+from config import Config as UploaderConfig
 from app import db
 from app.models import Action, VNF
 from app.VNF import bp
 from app.VNF.forms import VNFForm
 from Helper import Log
-from datetime import datetime
-from werkzeug.utils import secure_filename
-from config import Config as UploaderConfig
 
 
 @bp.route('/repository', methods=['GET', 'POST'])

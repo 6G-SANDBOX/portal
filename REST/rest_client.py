@@ -1,7 +1,7 @@
-import json
 import re
-from os.path import realpath, join
+import json
 from urllib3 import connection_from_url
+from os.path import realpath, join
 
 
 class RestClient:

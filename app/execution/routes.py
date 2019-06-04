@@ -1,10 +1,10 @@
 from flask import render_template, flash, redirect, url_for
 from flask_login import current_user, login_required
-from REST import Dispatcher_Api
 from app import db
 from app.execution import bp
 from app.models import Experiment, Execution
 from Helper import Config, LogInfo, Log
+from REST import Dispatcher_Api
 
 
 @bp.route('/<execution_id>/reloadLog', methods=['GET'])

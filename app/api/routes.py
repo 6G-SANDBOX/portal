@@ -1,11 +1,11 @@
 import json
-from flask import request, jsonify
 from datetime import datetime
+from flask import request, jsonify
 from app import db
 from app.api import bp
 from app.models import Execution
-from Helper import Log
 from app.execution.routes import getLastExecution
+from Helper import Log
 
 
 @bp.route('/execution/<execution_id>', methods=['PATCH'])

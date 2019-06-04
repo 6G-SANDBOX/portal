@@ -1,8 +1,8 @@
-from typing import Dict
-from os.path import exists, abspath
-from shutil import copy
 import yaml
 import logging
+from typing import Dict
+from shutil import copy
+from os.path import exists, abspath
 
 
 class Dispatcher:

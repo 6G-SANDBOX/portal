@@ -1,13 +1,13 @@
 import logging
-from logging.handlers import RotatingFileHandler
-from enum import Enum, unique
-from flask import Flask
-from os.path import exists, join
-from os import makedirs
-from .config import Config
 import traceback
-from typing import Union, Optional, List, Dict, Tuple
+from enum import Enum, unique
 from dataclasses import dataclass
+from typing import Union, List, Dict, Tuple
+from flask import Flask
+from os import makedirs
+from os.path import exists, join
+from logging.handlers import RotatingFileHandler
+from .config import Config
 
 
 class ColoredFormatter(logging.Formatter):

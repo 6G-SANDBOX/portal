@@ -4,8 +4,8 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_bootstrap import Bootstrap
 from flask_mail import Mail
-from config import Config
 from flask_moment import Moment
+from config import Config
 from Helper import Log
 
 

@@ -1,7 +1,6 @@
-from .rest_client import RestClient
-from app.models import Experiment
-
 import json
+from app.models import Experiment
+from .rest_client import RestClient
 
 
 class Dispatcher_Api(RestClient):
