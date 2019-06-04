@@ -92,7 +92,11 @@ update{{ execution.id }}(nanobar);
             {{ moment(execution.start_time).format('DD MMMM YYYY, h:mm:ss') }}
         </td>
         <td class="col-md-2">
+            {% if execution.end_time%}
             {{ moment(execution.end_time).format('DD MMMM YYYY, h:mm:ss') }}
+            {% else %}
+               -
+            {% endif %}
         </td>
         <td class="col-md-3">
             {{ experiment.name }}

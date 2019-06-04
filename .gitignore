@@ -100,3 +100,9 @@ ENV/
 
 app.db
 .vagrant/
+
+# Uploads folder
+uploads/
+
+# Configuration file
+config.yml
