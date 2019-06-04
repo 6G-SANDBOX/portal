@@ -7,7 +7,7 @@
 <script>
 function checkNewExecutions(){
     let current = $('#hiddenNextId').text();
-    $.get("{{ url_for('main.nextExecutionId') }}")
+    $.get("{{ url_for('api.nextExecutionId') }}")
         .done(function (response){
             if (response['NextId'].toString() !== current){
                 location.reload();
@@ -21,7 +21,7 @@ setInterval(checkNewExecutions, 5000)
 {% if exe.status not in ['Finished', 'Cancelled', 'Errored'] %}
 <script>
 function update{{ exe.id }}(nanobar) {
-    $.get("{{ url_for('main.json', executionId=exe.id) }}")
+    $.get("{{ url_for('api.execution_json', executionId=exe.id) }}")
         .done(function (response) {
             if (response['Status'] === 'Finished'){
                 updateOne($("#table_status{{ exe.id }}"), response['Status']);
@@ -87,7 +87,7 @@ update{{ exe.id }}(nanobar);
     <table class="table table-striped">
         <tbody>
         {% for execution in executions %}
-        {% include '_execution.html' %}
+        {% include 'execution/_execution.html' %}
         {% endfor %}
         </tbody>
     </table>

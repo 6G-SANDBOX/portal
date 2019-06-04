@@ -1,10 +1,11 @@
-from flask import request
+import json
 from datetime import datetime
+from flask import request, jsonify
 from app import db
 from app.api import bp
 from app.models import Execution
+from app.execution.routes import getLastExecution
 from Helper import Log
-import json
 
 
 @bp.route('/execution/<execution_id>', methods=['PATCH'])
@@ -31,3 +32,23 @@ def set_execution_status(execution_id):
             Log.I(f'Execution {str(execution.id)}: Message - {str(execution.message)}')
         db.session.commit()
     return ""
+
+
+@bp.route('/<int:executionId>/json')
+def execution_json(executionId: int):
+    execution = Execution.query.get(executionId)
+    percent = 0
+    message = []
+    if execution is not None:
+        status = execution.status
+        percent = execution.percent
+        message = execution.message
+    return jsonify({
+        'Status': status, 'PerCent': percent, 'Message': message
+    })
+
+
+@bp.route('/nextExecutionId')
+def nextExecutionId():
+    Log.D(f'Next execution ID: {getLastExecution() + 1}')
+    return jsonify({'NextId': getLastExecution() + 1})

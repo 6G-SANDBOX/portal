@@ -1,11 +1,11 @@
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
-from app import db, login
+import jwt
+import json
 from time import time
 from flask import current_app
+from flask_login import UserMixin
 from sqlalchemy.types import TypeDecorator, VARCHAR
-import json
-import jwt
+from werkzeug.security import generate_password_hash, check_password_hash
+from app import db, login
 from Helper import Config as HelperConfig
 
 
