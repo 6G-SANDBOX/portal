@@ -4,11 +4,8 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_bootstrap import Bootstrap
 from flask_mail import Mail
-from logging.handlers import RotatingFileHandler
 from config import Config
 from flask_moment import Moment
-import os
-import logging
 from Helper import Log
 
 
@@ -46,6 +43,9 @@ def create_app(config_class=Config):
 
     from app.api import bp as api_bp
     app.register_blueprint(api_bp, url_prefix='/api')
+
+    from app.VNF import bp as vnf_bp
+    app.register_blueprint(vnf_bp, url_prefix='/VNF')
 
     Log.I('5Genesis startup')
     return app

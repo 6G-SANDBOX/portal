@@ -11,9 +11,3 @@ class ExperimentForm(FlaskForm):
 
 class RunExperimentForm(FlaskForm):
     submit = SubmitField('Run Experiment')
-
-
-class VNFForm(FlaskForm):
-    name = StringField('name', validators=[DataRequired()])
-    description = TextAreaField('description', validators=[DataRequired()])
-    submit = SubmitField('Upload')

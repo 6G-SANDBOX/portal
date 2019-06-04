@@ -12,7 +12,7 @@
 
 function confirmDelete(VNF_id){
     if (window.confirm("Do you really want to remove the VNF?")) {
-        window.location.replace("/delete_VNF/"+VNF_id);
+        window.location.replace("/VNF/delete/"+VNF_id);
     }
 }
 </script>
@@ -29,7 +29,7 @@ function confirmDelete(VNF_id){
         </div>
         <div id="{{ card }}_VNF" class="collapse" aria-labelledby="{{ card }}Header" data-parent="#{{ accordion }}">
             <div class="card-body">
-                {% include '_VNF.html' %}
+                {% include 'VNF/_VNF.html' %}
             </div>
         </div>
     </div>
@@ -42,7 +42,7 @@ function confirmDelete(VNF_id){
     <div style="text-align: center">
         <h2>VNF REPOSITORY</h2>
     </div>
-    <a class="btn btn-blue" href="{{ url_for('main.upload_VNF') }}" role="button">Upload VNF</a>
+    <a class="btn btn-blue" href="{{ url_for('VNF.upload') }}" role="button">Upload VNF</a>
     </br>
     </br>
     <div class="accordion" id="VNFAccordion">
