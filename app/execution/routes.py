@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, jsonify
+from flask import render_template, flash, redirect, url_for
 from flask_login import current_user, login_required
 from REST import Dispatcher_Api
 from app import db
@@ -44,26 +44,6 @@ def execution(execution_id):
             Log.I(f'Forbidden - User {current_user.name} don\'t have permission to access execution{execution_id}')
             flash(f'Forbidden - You don\'t have permission to access this execution', 'error')
             return redirect(url_for('main.index'))
-
-
-@bp.route('/<int:executionId>/json')
-def json(executionId: int):
-    execution = Execution.query.get(executionId)
-    percent = 0
-    message = []
-    if execution is not None:
-        status = execution.status
-        percent = execution.percent
-        message = execution.message
-    return jsonify({
-        'Status': status, 'PerCent': percent, 'Message': message
-    })
-
-
-@bp.route('/nextExecutionId')
-def nextExecutionId():
-    Log.D(f'Next execution ID: {getLastExecution() + 1}')
-    return jsonify({'NextId': getLastExecution() + 1})
 
 
 def getLastExecution():

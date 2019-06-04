@@ -15,7 +15,7 @@
 {% if execution.status not in ['Finished', 'Cancelled', 'Errored'] %}
 <script>
 function update{{ execution.id }}(nanobar) {
-    $.get("{{ url_for('execution.json', executionId=execution.id) }}")
+    $.get("{{ url_for('api.execution_json', executionId=execution.id) }}")
         .done(function (response) {
             if (response['Status'] === 'Finished'){
                 updateOne($("#table_status{{ execution.id }}"), response['Status']);
