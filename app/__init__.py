@@ -47,6 +47,12 @@ def create_app(config_class=Config):
     from app.VNF import bp as vnf_bp
     app.register_blueprint(vnf_bp, url_prefix='/VNF')
 
+    from app.experiment import bp as experiment_bp
+    app.register_blueprint(experiment_bp, url_prefix='/experiment')
+
+    from app.execution import bp as execution_bp
+    app.register_blueprint(execution_bp, url_prefix='/execution')
+
     Log.I('5Genesis startup')
     return app
 
