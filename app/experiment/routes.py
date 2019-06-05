@@ -1,24 +1,25 @@
 import os
+from datetime import datetime
+from typing import Dict, List
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_required
+from werkzeug.utils import secure_filename
+from config import Config as UploaderConfig
 from REST import Dispatcher_Api
 from app import db
 from app.experiment import bp
 from app.models import Experiment, Execution, Action, VNFLocation
 from app.experiment.forms import ExperimentForm, RunExperimentForm
-from Helper import Config, Log
-from datetime import datetime
-from werkzeug.utils import secure_filename
-from config import Config as UploaderConfig
 from app.execution.routes import getLastExecution
+from Helper import Config, Log
 
 
 @bp.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
-    list_UEs = list(Config().UEs.keys())
-    vnfs = []
-    vnfs_id = []
+    list_UEs: List[str] = list(Config().UEs.keys())
+    vnfs: List[str] = []
+    vnfs_id: List[int] = []
     if current_user.user_VNFs():
         for vnf in current_user.user_VNFs():
             vnfs.append(vnf.name)
@@ -34,9 +35,9 @@ def create():
         Log.D(f'Create experiment form data - Name: {form.name.data}, Type: {form.type.data}'
               f', TestCases {test_cases_selected}, UEs: {ues_selected}, Slice: {request.form.get("slice", None)}')
 
-        experiment = Experiment(name=form.name.data, author=current_user, unattended=True, type=form.type.data,
-                                test_cases=test_cases_selected, ues=ues_selected)
-        form_slice=request.form.get('slice', None)
+        experiment: Experiment = Experiment(name=form.name.data, author=current_user, unattended=True,
+                                            type=form.type.data, test_cases=test_cases_selected, ues=ues_selected)
+        form_slice = request.form.get('slice', None)
         if form_slice is not None:
             experiment.slice = form_slice
 
@@ -49,9 +50,9 @@ def create():
         else:
             count = 0
         for i in range(count):
-            loc='location'+str(i+1)
-            vnf='VNF'+str(i+1)
-            vnf_loc = VNFLocation(location=request.form[loc], VNF_id=request.form[vnf], experiment_id=experiment.id)
+            loc = 'location'+str(i+1)
+            vnf = 'VNF'+str(i+1)
+            vnf_loc: VNFLocation = VNFLocation(location=request.form[loc], VNF_id=request.form[vnf], experiment_id=experiment.id)
             Log.D(f'Selected VNF {request.form[vnf]} with location {request.form[loc]}')
             db.session.add(vnf_loc)
             db.session.commit()
@@ -70,7 +71,7 @@ def create():
                 db.session.commit()
                 Log.I(f'Added NSD file {fileNSD_name} to experiment {experiment.id}')
         
-        action = Action(timestamp=datetime.utcnow(), author=current_user,
+        action: Action = Action(timestamp=datetime.utcnow(), author=current_user,
                         message=f'<a href="/experiment/{experiment.id}">Created experiment: {form.name.data}</a>')
         db.session.add(action)
         db.session.commit()
@@ -84,8 +85,8 @@ def create():
 @bp.route('/<experiment_id>/reload', methods=['GET', 'POST'])
 @bp.route('/<experiment_id>', methods=['GET', 'POST'])
 @login_required
-def experiment(experiment_id):
-    exp = Experiment.query.get(experiment_id)
+def experiment(experiment_id: int):
+    exp: Experiment = Experiment.query.get(experiment_id)
     formRun = RunExperimentForm()
     config = Config()
     if formRun.validate_on_submit():
@@ -97,7 +98,7 @@ def experiment(experiment_id):
         return redirect(url_for('main.index'))
     else:
         if exp.user_id is current_user.id:
-            executions = exp.experiment_executions()
+            executions: List[Experiment] = exp.experiment_executions()
             if executions.count() == 0:
                 flash(f'The experiment {exp.name} doesn\'t have any executions yet', 'info')
                 return redirect(url_for('main.index'))
@@ -111,20 +112,20 @@ def experiment(experiment_id):
             return redirect(url_for('main.index'))
 
 
-def runExperiment(config):
+def runExperiment(config: Config):
     try:
         api = Dispatcher_Api(config.Dispatcher.Host, config.Dispatcher.Port, "/api/v0")  # //api/v0
-        jsonresponse = api.Post(request.form['id'])
+        jsonresponse: Dict = api.Post(request.form['id'])
         Log.D(f'Ran experiment response {jsonresponse}')
         Log.I(f'Ran experiment {request.form["id"]}')
         flash(f'Success: {jsonresponse["Success"]} - Execution Id: '
               f'{jsonresponse["ExecutionId"]} - Message: {jsonresponse["Message"]}', 'info')
-        execution = Execution(id=jsonresponse["ExecutionId"], experiment_id=request.form['id'],
+        execution: Execution = Execution(id=jsonresponse["ExecutionId"], experiment_id=request.form['id'],
                               status='Init')
         db.session.add(execution)
         db.session.commit()
         Log.I(f'Added execution {jsonresponse["ExecutionId"]}')
-        exp = Experiment.query.get(execution.experiment_id)
+        exp: Experiment = Experiment.query.get(execution.experiment_id)
         action = Action(timestamp=datetime.utcnow(), author=current_user,
                         message=f'<a href="/execution/{execution.id}">Ran experiment: {exp.name}</a>')
         db.session.add(action)

@@ -1,5 +1,6 @@
 from flask import render_template, flash, redirect, url_for
 from flask_login import current_user, login_required
+from typing import Dict
 from app import db
 from app.execution import bp
 from app.models import Experiment, Execution
@@ -10,19 +11,19 @@ from REST import Dispatcher_Api
 @bp.route('/<execution_id>/reloadLog', methods=['GET'])
 @bp.route('/<execution_id>', methods=['GET'])
 @login_required
-def execution(execution_id):
-    exe = Execution.query.get(execution_id)
+def execution(execution_id: int):
+    exe: Execution = Execution.query.get(execution_id)
     if exe is None:
         Log.I(f'execution not found')
         flash(f'execution not found', 'error')
         return redirect(url_for('main.index'))
     else:
-        exp = Experiment.query.get(exe.experiment_id)
+        exp: Experiment = Experiment.query.get(exe.experiment_id)
         if exp.user_id is current_user.id:
             try:
                 config = Config()
                 api = Dispatcher_Api(config.Dispatcher.Host, config.Dispatcher.Port, "/experiment")
-                jsonresponse = api.Get(execution_id)
+                jsonresponse: Dict = api.Get(execution_id)
                 Log.D(f'Access exeuction logs response {jsonresponse}')
                 status = jsonresponse["Status"]
                 if status == 'Not Found':
@@ -46,5 +47,5 @@ def execution(execution_id):
             return redirect(url_for('main.index'))
 
 
-def getLastExecution():
+def getLastExecution() -> int:
     return db.session.query(Execution).order_by(Execution.id.desc()).first().id

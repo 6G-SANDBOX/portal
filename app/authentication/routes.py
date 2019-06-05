@@ -17,7 +17,7 @@ def register():
     if form.validate_on_submit():
         Log.D(f'Registration form data - Username: {form.username.data}, Email: {form.email.data},'
               f' Organization: {form.organization.data}')
-        user = User(username=form.username.data, email=form.email.data, organization=form.organization.data)
+        user: User = User(username=form.username.data, email=form.email.data, organization=form.organization.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -35,7 +35,7 @@ def login():
         return redirect(url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user: User = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             Log.I(f'Invalid username or password')
             flash('Invalid username or password', 'error')
@@ -63,7 +63,7 @@ def reset_password_request():
         return redirect(url_for('main.index'))
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user: User = User.query.filter_by(email=form.email.data).first()
         if user:
             send_password_reset_email(user)
         flash('Check your email for the instructions to reset your password', 'info')
@@ -73,11 +73,11 @@ def reset_password_request():
 
 
 @bp.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
+def reset_password(token: str):
     if current_user.is_authenticated:
         Log.I(f'The user is already authenticated')
         return redirect(url_for('main.index'))
-    user = User.verify_reset_password_token(token)
+    user: User = User.verify_reset_password_token(token)
     if not user:
         Log.I(f'Reset password token do not match any user')
         return redirect(url_for('main.index'))

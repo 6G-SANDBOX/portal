@@ -1,5 +1,6 @@
 import os
 import shutil
+from typing import List
 from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_required
@@ -15,7 +16,7 @@ from Helper import Log
 @bp.route('/repository', methods=['GET', 'POST'])
 @login_required
 def repository():
-    VNFs = current_user.user_VNFs()
+    VNFs: List[VNF] = current_user.user_VNFs()
     return render_template('VNF/repository.html', title='Home', VNFs=VNFs)
 
 
@@ -43,13 +44,13 @@ def upload():
             Log.D(f'Upload VNF form data - Name: {form.name.data}, Description: {form.description.data}'
                   f', VNFD {fileVNFD_name}, image: {fileImage_name}')
 
-            new_VNF = VNF(name=form.name.data, author=current_user, description=form.description.data,
+            new_VNF: VNF = VNF(name=form.name.data, author=current_user, description=form.description.data,
                           VNFD=fileVNFD_name, image=fileImage_name)
 
             db.session.add(new_VNF)
             db.session.commit()
             Log.I(f'Added VNF {new_VNF.name}')
-            action = Action(timestamp=datetime.utcnow(), author=current_user,
+            action: Action = Action(timestamp=datetime.utcnow(), author=current_user,
                             message=f'<a href="/VNF/repository">Uploaded VNF: {new_VNF.name}</a>')
             Log.I(f'Added action - Uploaded VNF')
             db.session.add(action)
@@ -72,8 +73,8 @@ def upload():
 
 @bp.route('/delete/<vnf_id>', methods=['GET'])
 @login_required
-def delete(vnf_id):
-    vnf = VNF.query.get(vnf_id)
+def delete(vnf_id: int):
+    vnf: VNF = VNF.query.get(vnf_id)
     if vnf:
         if vnf.user_id == current_user.id:
             db.session.delete(vnf)

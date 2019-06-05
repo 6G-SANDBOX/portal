@@ -1,6 +1,6 @@
 import yaml
 import logging
-from typing import Dict
+from typing import Dict, List
 from shutil import copy
 from os.path import exists, abspath
 
@@ -60,7 +60,7 @@ class Config:
             self.data = yaml.safe_load(file)
 
     @property
-    def Notices(self):
+    def Notices(self) -> List[str]:
         if not exists(self.FILENAME_NOTICES):
             return []
 
@@ -69,7 +69,7 @@ class Config:
             return notices['Notices']
 
     @property
-    def Dispatcher(self):
+    def Dispatcher(self) -> Dispatcher:
         return Dispatcher(self.data)
 
     @property
@@ -97,5 +97,5 @@ class Config:
         return self.data['Grafana URL']
 
     @property
-    def Logging(self):
+    def Logging(self) -> Logging:
         return Logging(self.data)

@@ -1,9 +1,10 @@
 from flask import render_template, current_app
 from app.email import send_email
+from app.models import User
 from Helper import Log
 
 
-def send_password_reset_email(user):
+def send_password_reset_email(user: User):
     token = user.get_reset_password_token()
     send_email('[5Genesis] Reset Your Password',
                recipients=[user.email],

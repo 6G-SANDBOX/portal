@@ -1,5 +1,6 @@
 import re
 import json
+from typing import Dict
 from urllib3 import connection_from_url
 from os.path import realpath, join
 
@@ -52,5 +53,5 @@ class RestClient:
                                  retries=self.RETRIES)
 
     @staticmethod
-    def ResponseToJson(response):
+    def ResponseToJson(response) -> Dict:
         return json.loads(response.data.decode('utf-8'))

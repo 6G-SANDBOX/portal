@@ -1,5 +1,6 @@
 import jwt
 import json
+from typing import Dict, List
 from time import time
 from flask import current_app
 from flask_login import UserMixin
@@ -33,11 +34,6 @@ class JSONEncodedDict(TypeDecorator):
         return value
 
 
-@login.user_loader
-def load_user(id):
-    return User.query.get(int(id))
-
-
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
@@ -62,16 +58,16 @@ class User(UserMixin, db.Model):
             {'reset_password': self.id, 'exp': time() + expires_in},
             current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
-    def user_experiments(self):
-        exp = Experiment.query.filter_by(user_id=self.id)
+    def user_experiments(self) -> List:
+        exp: List = Experiment.query.filter_by(user_id=self.id)
         return exp.order_by(Experiment.id.desc())
 
-    def user_actions(self):
-        acts = Action.query.filter_by(user_id=self.id).order_by(Action.id.desc()).limit(10)
+    def user_actions(self) -> List:
+        acts: List = Action.query.filter_by(user_id=self.id).order_by(Action.id.desc()).limit(10)
         return acts
 
-    def user_VNFs(self):
-        VNFs = VNF.query.filter_by(user_id=self.id).order_by(VNF.id)
+    def user_VNFs(self) -> List:
+        VNFs: List = VNF.query.filter_by(user_id=self.id).order_by(VNF.id)
         return VNFs
 
     @staticmethod
@@ -83,11 +79,16 @@ class User(UserMixin, db.Model):
             return
         return User.query.get(id)
 
-    def serialization(self):
-        experiment_ids = [exp.id for exp in self.user_experiments()]
+    def serialization(self) -> Dict[str, object]:
+        experiment_ids: List[int] = [exp.id for exp in self.user_experiments()]
         dictionary = {'Id': self.id, 'UserName': self.username, 'Email': self.email, 'Organization': self.organization,
                       'Experiments': experiment_ids}
         return dictionary
+
+
+@login.user_loader
+def load_user(id: int) -> User:
+    return User.query.get(int(id))
 
 
 class Experiment(db.Model):
@@ -107,24 +108,24 @@ class Experiment(db.Model):
         return f'<Id: {self.id}, Name: {self.name}, User_id: {self.user_id}, Type: {self.type}, ' \
             f'Unattended: {self.unattended}, TestCases: {self.test_cases}, NSD: {self.NSD}, Slice: {self.slice}>'
 
-    def experiment_executions(self):
-        exp = Execution.query.filter_by(experiment_id=self.id)
+    def experiment_executions(self) -> List:
+        exp: List = Execution.query.filter_by(experiment_id=self.id)
         return exp.order_by(Execution.id.desc())
 
-    def experiment_vnfs(self):
-        vnfs = VNFLocation.query.filter_by(experiment_id=self.id)
+    def experiment_vnfs(self) -> List:
+        vnfs: List = VNFLocation.query.filter_by(experiment_id=self.id)
         return vnfs.order_by(VNFLocation.id.asc())
 
-    def serialization(self):
-        execution_ids = [exe.id for exe in self.experiment_executions()]
+    def serialization(self) -> Dict[str, object]:
+        execution_ids: List = [exe.id for exe in self.experiment_executions()]
         ueDictionary = {}
-        all_UEs = HelperConfig().UEs
+        all_UEs: List = HelperConfig().UEs
         if self.ues:
             for ue in self.ues:
                 if ue in all_UEs.keys(): ueDictionary[ue] = all_UEs[ue]
         vnfs_locations = []
         for vnf_loc in self.experiment_vnfs():
-            vnf_location = VNF.query.get(vnf_loc.VNF_id).serialization()
+            vnf_location: Dict[str, object] = VNF.query.get(vnf_loc.VNF_id).serialization()
             vnf_location['Location'] = vnf_loc.location
             vnfs_locations.append(vnf_location)
 
@@ -175,7 +176,7 @@ class VNF(db.Model):
         return f'<VNF: {self.id}, Name: {self.name}, Description: {self.description}, VNFD: {self.VNFD},' \
             f'Image: {self.image}, User_id: {self.user_id}>'
 
-    def serialization(self):
+    def serialization(self) -> Dict[str, object]:
         dictionary = {'Id': self.id, 'Name': self.name, 'Description': self.description, 'VNFD': self.VNFD,
                       "Image": self.image, "User": self.user_id}
         return dictionary
