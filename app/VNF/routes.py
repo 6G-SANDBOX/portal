@@ -16,7 +16,7 @@ from Helper import Log
 @bp.route('/repository', methods=['GET', 'POST'])
 @login_required
 def repository():
-    VNFs: List[VNF] = current_user.user_VNFs()
+    VNFs: List[VNF] = current_user.userVNFs()
     return render_template('VNF/repository.html', title='Home', VNFs=VNFs)
 
 
@@ -38,31 +38,31 @@ def upload():
             return redirect(request.url)
 
         if fileVNFD and fileImage:
-            fileVNFD_name = secure_filename(fileVNFD.filename)
-            fileImage_name = secure_filename(fileImage.filename)
+            fileVNFDName = secure_filename(fileVNFD.filename)
+            fileImageName = secure_filename(fileImage.filename)
 
             Log.D(f'Upload VNF form data - Name: {form.name.data}, Description: {form.description.data}'
-                  f', VNFD {fileVNFD_name}, image: {fileImage_name}')
+                  f', VNFD {fileVNFDName}, image: {fileImageName}')
 
-            new_VNF: VNF = VNF(name=form.name.data, author=current_user, description=form.description.data,
-                          VNFD=fileVNFD_name, image=fileImage_name)
+            newVNF: VNF = VNF(name=form.name.data, author=current_user, description=form.description.data,
+                          VNFD=fileVNFDName, image=fileImageName)
 
-            db.session.add(new_VNF)
+            db.session.add(newVNF)
             db.session.commit()
-            Log.I(f'Added VNF {new_VNF.name}')
+            Log.I(f'Added VNF {newVNF.name}')
             action: Action = Action(timestamp=datetime.utcnow(), author=current_user,
-                            message=f'<a href="/VNF/repository">Uploaded VNF: {new_VNF.name}</a>')
+                            message=f'<a href="/VNF/repository">Uploaded VNF: {newVNF.name}</a>')
             Log.I(f'Added action - Uploaded VNF')
             db.session.add(action)
             db.session.commit()
 
-            baseFolder = os.path.join(UploaderConfig.UPLOAD_FOLDER, 'vnfs', str(new_VNF.id))
+            baseFolder = os.path.join(UploaderConfig.UPLOAD_FOLDER, 'vnfs', str(newVNF.id))
             os.makedirs(os.path.join(baseFolder, "vnfd"), mode=0o755, exist_ok=True)
             os.makedirs(os.path.join(baseFolder, "images"), mode=0o755, exist_ok=True)
-            fileVNFD.save(os.path.join(baseFolder, "vnfd", fileVNFD_name))
-            Log.D(f'Saved VNFD file {fileVNFD_name} in VNF {new_VNF.id}')
-            fileImage.save(os.path.join(baseFolder, "images", fileImage_name))
-            Log.D(f'Saved Image file {fileImage_name} in VNF {new_VNF.id}')
+            fileVNFD.save(os.path.join(baseFolder, "vnfd", fileVNFDName))
+            Log.D(f'Saved VNFD file {fileVNFDName} in VNF {newVNF.id}')
+            fileImage.save(os.path.join(baseFolder, "images", fileImageName))
+            Log.D(f'Saved Image file {fileImageName} in VNF {newVNF.id}')
 
             flash('Your VNF has been successfully uploaded', 'info')
             return redirect(url_for('VNF.repository'))
@@ -71,19 +71,19 @@ def upload():
     return render_template('VNF/upload.html', title='Home', form=form)
 
 
-@bp.route('/delete/<vnf_id>', methods=['GET'])
+@bp.route('/delete/<vnfId>', methods=['GET'])
 @login_required
-def delete(vnf_id: int):
-    vnf: VNF = VNF.query.get(vnf_id)
+def delete(vnfId: int):
+    vnf: VNF = VNF.query.get(vnfId)
     if vnf:
         if vnf.user_id == current_user.id:
             db.session.delete(vnf)
             db.session.commit()
-            shutil.rmtree(os.path.join(UploaderConfig.UPLOAD_FOLDER, 'vnfs', str(vnf_id)))
-            Log.I(f'VNF {vnf_id} successfully removed')
+            shutil.rmtree(os.path.join(UploaderConfig.UPLOAD_FOLDER, 'vnfs', str(vnfId)))
+            Log.I(f'VNF {vnfId} successfully removed')
             flash(f'The VNF has been successfully removed', 'info')
         else:
-            Log.I(f'Forbidden - User {current_user.name} don\'t have permission to remove VNF {vnf_id}')
+            Log.I(f'Forbidden - User {current_user.name} don\'t have permission to remove VNF {vnfId}')
             flash(f'Forbidden - You don\'t have permission to remove this VNF', 'error')
     else:
         return render_template('errors/404.html'), 404

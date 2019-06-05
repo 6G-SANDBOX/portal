@@ -13,19 +13,19 @@
 <script src="{{url_for('static', filename='js/browseFiles.js')}}"></script>
 <script>
 (function() {
-  $("#vnf_count").bind('change', function() {
+  $("#vnfCount").bind('change', function() {
     curVal = $.trim($(this).val()).match(/^\d*$/);
     curFloors = $('.vnf').length;
     vnfs = []
-    vnfs_id = []
+    vnfsId = []
     {% for vnf in vnfs %}
       vnfs.push("{{ vnf }}");
     {% endfor %}
-    {% for vnf_id in vnfs_id %}
-      vnfs_id.push("{{ vnf_id }}");
+    {% for vnfId in vnfsId %}
+      vnfsId.push("{{ vnfId }}");
     {% endfor %}
     if (curVal > curFloors) {
-      addVNFs(curFloors, curVal, vnfs, vnfs_id);
+      addVNFs(curFloors, curVal, vnfs, vnfsId);
     } else if (curVal < curFloors) {
       removeVNFs(curVal);
     }
@@ -57,14 +57,14 @@
             </div>
         </div>
         <h4>Test Cases</h4>
-        {% for test_case in test_case_list %}
+        {% for test_case in testCaseList %}
         <div class="custom-control custom-checkbox">
-            <input type="checkbox" class="custom-control-input" name="test_cases" value="{{test_case}}">
+            <input type="checkbox" class="custom-control-input" name="testCases" value="{{test_case}}">
             {{test_case}}
         </div>
         {% endfor %}
         <h4>UEs</h4>
-        {% for ue in ue_list %}
+        {% for ue in ueList %}
         <div class="custom-control custom-checkbox">
             <input type="checkbox" class="custom-control-input" name="ues" value="{{ue}}"> {{ue}}
         </div>
@@ -73,12 +73,12 @@
         <div class="col-sm-12" style="padding: 0 !important; margin-bottom: 20px">
             <div class="custom-control custom-checkbox col-sm-1"
                  style="padding: 5px 0 !important; margin-right: -30px;">
-                <input type="checkbox" class="custom-control-input" id="slice_none" name="slice_none"
+                <input type="checkbox" class="custom-control-input" id="sliceNone" name="sliceNone"
                        onclick="disableSliceList()">
             </div>
             <div class="col-sm-11" style="padding: 0 !important;">
                 <select id="sliceList" class="form-control" name="slice" disabled>
-                    {% for slice in slice_list %}
+                    {% for slice in sliceList %}
                     <option value="{{ slice }}">{{ slice }}</option>
                     {% endfor %}
                 </select>
@@ -86,7 +86,7 @@
         </div>
         {% if vnfs %}
         <h4>VNFs
-            <input type="number" id="vnf_count" name="vnf_count" class="InputBox form-control" value="0" min="0"
+            <input type="number" id="vnfCount" name="vnfCount" class="InputBox form-control" value="0" min="0"
                    max="24"
                    style="width: 10%;"/>
         </h4>

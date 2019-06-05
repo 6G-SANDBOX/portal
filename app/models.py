@@ -47,31 +47,31 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return f'<Id: {self.id}, Username: {self.username}, Email: {self.email}, Organization: {self.organization}'
 
-    def set_password(self, password):
+    def setPassword(self, password):
         self.password_hash = generate_password_hash(password)
 
-    def check_password(self, password):
+    def checkPassword(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def get_reset_password_token(self, expires_in=600):
+    def getResetPasswordToken(self, expires_in=600):
         return jwt.encode(
             {'reset_password': self.id, 'exp': time() + expires_in},
             current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
-    def user_experiments(self) -> List:
+    def userExperiments(self) -> List:
         exp: List = Experiment.query.filter_by(user_id=self.id)
         return exp.order_by(Experiment.id.desc())
 
-    def user_actions(self) -> List:
+    def userActions(self) -> List:
         acts: List = Action.query.filter_by(user_id=self.id).order_by(Action.id.desc()).limit(10)
         return acts
 
-    def user_VNFs(self) -> List:
+    def userVNFs(self) -> List:
         VNFs: List = VNF.query.filter_by(user_id=self.id).order_by(VNF.id)
         return VNFs
 
     @staticmethod
-    def verify_reset_password_token(token):
+    def verifyResetPasswordToken(token):
         try:
             id = jwt.decode(token, current_app.config['SECRET_KEY'],
                             algorithms=['HS256'])['reset_password']
@@ -80,9 +80,9 @@ class User(UserMixin, db.Model):
         return User.query.get(id)
 
     def serialization(self) -> Dict[str, object]:
-        experiment_ids: List[int] = [exp.id for exp in self.user_experiments()]
+        experimentIds: List[int] = [exp.id for exp in self.userExperiments()]
         dictionary = {'Id': self.id, 'UserName': self.username, 'Email': self.email, 'Organization': self.organization,
-                      'Experiments': experiment_ids}
+                      'Experiments': experimentIds}
         return dictionary
 
 
@@ -108,31 +108,31 @@ class Experiment(db.Model):
         return f'<Id: {self.id}, Name: {self.name}, User_id: {self.user_id}, Type: {self.type}, ' \
             f'Unattended: {self.unattended}, TestCases: {self.test_cases}, NSD: {self.NSD}, Slice: {self.slice}>'
 
-    def experiment_executions(self) -> List:
+    def experimentExecutions(self) -> List:
         exp: List = Execution.query.filter_by(experiment_id=self.id)
         return exp.order_by(Execution.id.desc())
 
-    def experiment_vnfs(self) -> List:
+    def experimentVNFs(self) -> List:
         vnfs: List = VNFLocation.query.filter_by(experiment_id=self.id)
         return vnfs.order_by(VNFLocation.id.asc())
 
     def serialization(self) -> Dict[str, object]:
-        execution_ids: List = [exe.id for exe in self.experiment_executions()]
+        executionIds: List = [exe.id for exe in self.experimentExecutions()]
         ueDictionary = {}
-        all_UEs: List = HelperConfig().UEs
+        allUEs: List = HelperConfig().UEs
         if self.ues:
             for ue in self.ues:
-                if ue in all_UEs.keys(): ueDictionary[ue] = all_UEs[ue]
-        vnfs_locations = []
-        for vnf_loc in self.experiment_vnfs():
-            vnf_location: Dict[str, object] = VNF.query.get(vnf_loc.VNF_id).serialization()
-            vnf_location['Location'] = vnf_loc.location
-            vnfs_locations.append(vnf_location)
+                if ue in allUEs.keys(): ueDictionary[ue] = allUEs[ue]
+        vnfsLocations = []
+        for vnfLoc in self.experimentVNFs():
+            vnfLocation: Dict[str, object] = VNF.query.get(vnfLoc.VNF_id).serialization()
+            vnfLocation['Location'] = vnfLoc.location
+            vnfsLocations.append(vnfLocation)
 
         dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(),
-                      'Executions': execution_ids, "Platform": HelperConfig().Platform,
+                      'Executions': executionIds, "Platform": HelperConfig().Platform,
                       "TestCases": self.test_cases, "UEs": ueDictionary, "Slice": self.slice, "NSD": self.NSD,
-                      "VNF_Locations": vnfs_locations}
+                      "VNF_Locations": vnfsLocations}
         return dictionary
 
 

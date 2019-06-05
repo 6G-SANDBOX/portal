@@ -13,13 +13,13 @@ from Helper import Config
 @bp.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-    experiments: List[Experiment] = current_user.user_experiments()
+    experiments: List[Experiment] = current_user.userExperiments()
     formRun = RunExperimentForm()
     config = Config()
     notices: List[str] = config.Notices
     if formRun.validate_on_submit():
         runExperiment(config)
         return redirect(f"{request.url}/reload")
-    actions: List[Action] = User.query.get(current_user.id).user_actions()
+    actions: List[Action] = User.query.get(current_user.id).userActions()
     return render_template('index.html', title='Home', formRun=formRun, experiments=experiments, notices=notices,
                            actions=actions)

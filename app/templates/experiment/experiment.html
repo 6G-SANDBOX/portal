@@ -22,7 +22,7 @@ setInterval(checkNewExecutions, 5000)
 {% if exe.status not in ['Finished', 'Cancelled', 'Errored'] %}
 <script>
 function update{{ exe.id }}(nanobar) {
-    $.get("{{ url_for('api.execution_json', executionId=exe.id) }}")
+    $.get("{{ url_for('api.executionJson', executionId=exe.id) }}")
         .done(function (response) {
             if (response['Status'] === 'Finished'){
                 updateOne($("#table_status{{ exe.id }}"), response['Status']);

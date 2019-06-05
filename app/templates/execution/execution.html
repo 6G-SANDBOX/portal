@@ -16,7 +16,7 @@
 {% if execution.status not in ['Finished', 'Cancelled', 'Errored'] %}
 <script>
 function update{{ execution.id }}(nanobar) {
-    $.get("{{ url_for('api.execution_json', executionId=execution.id) }}")
+    $.get("{{ url_for('api.executionJson', executionId=execution.id) }}")
         .done(function (response) {
             if (response['Status'] === 'Finished'){
                 updateOne($("#table_status{{ execution.id }}"), response['Status']);
@@ -103,10 +103,10 @@ update{{ execution.id }}(nanobar);
             {{ experiment.name }}
         </td>
         <td class="col-md-2">
-            {% if grafana_url == None or not execution.dashboard_url %}
+            {% if grafanaUrl == None or not execution.dashboard_url %}
             <a class="btn btn-primary btn-sm disabled" href="#" role="button">Results</a>
             {% else %}
-            <a class="btn btn-blue btn-sm" href="{{ grafana_url }}{{ execution.dashboard_url }}" role="button"
+            <a class="btn btn-blue btn-sm" href="{{ grafanaUrl }}{{ execution.dashboard_url }}" role="button"
                target="_blank">Results</a>
             {% endif %}
         </td>

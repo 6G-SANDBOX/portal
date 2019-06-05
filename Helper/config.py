@@ -54,7 +54,7 @@ class Config:
 
     def Reload(self):
         if not exists(self.FILENAME):
-            copy('Helper/default_config', self.FILENAME)
+            copy('Helper/defaultConfig', self.FILENAME)
 
         with open(self.FILENAME, 'r', encoding='utf-8') as file:
             self.data = yaml.safe_load(file)

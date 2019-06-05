@@ -7,7 +7,7 @@
 $(document).ready(
   function() {
     $('#checkBtn').click(function() {
-      checked = $("input[name=test_cases]:checked").length;
+      checked = $("input[name=testCases]:checked").length;
       if (!checked) {
         alert("Please, select at least one Test Case");
         return false;
@@ -16,11 +16,11 @@ $(document).ready(
   }
 );
 
-function addVNFs(actual, target, vnfs, vnfs_id) {
+function addVNFs(actual, target, vnfs, vnfsId) {
   for (i = actual + 1; i <= target; i++) {
     newItemHTML = '<tr><td class="table-cell-divisor-right"><center>' + i + '</center></td><td class="table-cell-divisor-right"><select class="vnf InputBox form-control" name="VNF' + i + '">'
     for (j = 0; j < vnfs.length; j++) {
-      newItemHTML = newItemHTML + '<option value="' + vnfs_id[j] + '">' + vnfs[j] + '</option>';
+      newItemHTML = newItemHTML + '<option value="' + vnfsId[j] + '">' + vnfs[j] + '</option>';
     }
     newItemHTML = newItemHTML + '</select></td><td><select class="form-control" name="location' + i + '"><option value="Data Network" selected>Data Network</option><option value="Edge">Edge</option></select></td></tr>'
     $("table#vnf tr").last().after(newItemHTML);
@@ -34,7 +34,7 @@ function removeVNFs(target) {
 }
 
 function disableSliceList() {
-  var checkBox = document.getElementById('slice_none');
+  var checkBox = document.getElementById('sliceNone');
   var sliceList = document.getElementById('sliceList');
 
   if (checkBox.checked == true) {

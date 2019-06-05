@@ -9,11 +9,11 @@ from app.execution.routes import getLastExecution
 from Helper import Log
 
 
-@bp.route('/execution/<execution_id>', methods=['PATCH'])
-def set_execution_status(execution_id: int) -> Dict[str, str]:
+@bp.route('/execution/<executionId>', methods=['PATCH'])
+def setExecutionStatus(executionId: int) -> Dict[str, str]:
     data: Dict = json.loads(request.data.decode('utf8'))
-    Log.D(f'ELCM execution data (Execution: {execution_id}): {data}')
-    execution: Execution = Execution.query.get(int(execution_id))
+    Log.D(f'ELCM execution data (Execution: {executionId}): {data}')
+    execution: Execution = Execution.query.get(int(executionId))
     if execution:
         if 'Status' in data:
             if data["Status"] in ['PreRun']:
@@ -36,7 +36,7 @@ def set_execution_status(execution_id: int) -> Dict[str, str]:
 
 
 @bp.route('/<int:executionId>/json')
-def execution_json(executionId: int) -> Dict[str, object]:
+def executionJson(executionId: int) -> Dict[str, object]:
     execution: Execution = Execution.query.get(executionId)
     percent = 0
     message = []

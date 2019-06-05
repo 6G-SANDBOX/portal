@@ -5,7 +5,7 @@ from app import db
 from app.models import User
 from app.authentication import bp
 from app.authentication.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
-from app.authentication.email import send_password_reset_email
+from app.authentication.email import sendPasswordResetEmail
 from Helper import Config, Log
 
 
@@ -18,7 +18,7 @@ def register():
         Log.D(f'Registration form data - Username: {form.username.data}, Email: {form.email.data},'
               f' Organization: {form.organization.data}')
         user: User = User(username=form.username.data, email=form.email.data, organization=form.organization.data)
-        user.set_password(form.password.data)
+        user.setPassword(form.password.data)
         db.session.add(user)
         db.session.commit()
         flash('You have been registered', 'info')
@@ -36,16 +36,16 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user: User = User.query.filter_by(username=form.username.data).first()
-        if user is None or not user.check_password(form.password.data):
+        if user is None or not user.checkPassword(form.password.data):
             Log.I(f'Invalid username or password')
             flash('Invalid username or password', 'error')
             return redirect(url_for('authentication.login'))
-        login_user(user, remember=form.remember_me.data)
+        login_user(user, remember=form.rememberMe.data)
         Log.I(f'User {user.username} logged in')
-        next_page = request.args.get('next')
-        if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('main.index')
-        return redirect(next_page)
+        nextPage = request.args.get('next')
+        if not nextPage or url_parse(nextPage).netloc != '':
+            nextPage = url_for('main.index')
+        return redirect(nextPage)
     return render_template('authentication/login.html', title='Sign In', form=form,
                            description=Config().Description)
 
@@ -57,35 +57,35 @@ def logout():
     return redirect(url_for('main.index'))
 
 
-@bp.route('/reset_password_request', methods=['GET', 'POST'])
-def reset_password_request():
+@bp.route('/resetPasswordRequest', methods=['GET', 'POST'])
+def resetPasswordRequest():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
         user: User = User.query.filter_by(email=form.email.data).first()
         if user:
-            send_password_reset_email(user)
+            sendPasswordResetEmail(user)
         flash('Check your email for the instructions to reset your password', 'info')
         return redirect(url_for('authentication.login'))
-    return render_template('authentication/reset_password_request.html',
+    return render_template('authentication/resetPasswordRequest.html',
                            title='Reset Password', form=form, description=Config().Description)
 
 
-@bp.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_password(token: str):
+@bp.route('/resetPassword/<token>', methods=['GET', 'POST'])
+def resetPassword(token: str):
     if current_user.is_authenticated:
         Log.I(f'The user is already authenticated')
         return redirect(url_for('main.index'))
-    user: User = User.verify_reset_password_token(token)
+    user: User = User.verifyResetPasswordToken(token)
     if not user:
         Log.I(f'Reset password token do not match any user')
         return redirect(url_for('main.index'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        user.set_password(form.password.data)
+        user.setPassword(form.password.data)
         db.session.commit()
         flash('Your password has been reset.', 'info')
         Log.I(f'Password reset for {user.name}')
         return redirect(url_for('authentication.login'))
-    return render_template('authentication/reset_password.html', form=form, description=Config().Description)
+    return render_template('authentication/resetPassword.html', form=form, description=Config().Description)
