@@ -8,5 +8,5 @@ config = Config()
 
 @app.shell_context_processor
 def make_shell_context() -> Dict:
-    return {'db': db, 'User': User, 'Experiment': Experiment, 'Execution': Execution, 'Action': Action, 'VNF': VNF,
+    return {'DB': db, 'User': User, 'Experiment': Experiment, 'Execution': Execution, 'Action': Action, 'VNF': VNF,
             'VNFLocation': VNFLocation, 'Config': config}

@@ -25,6 +25,8 @@ def repository():
 def upload():
     form = VNFForm()
     if form.validate_on_submit():
+
+        # Check if files were uploaded correctly
         if 'fileVNFD' not in request.files or 'fileImage' not in request.files:
             Log.I('Can\'t upload VNF. There are files missing')
             flash('There are files missing', 'error')
@@ -41,8 +43,8 @@ def upload():
             fileVNFDName = secure_filename(fileVNFD.filename)
             fileImageName = secure_filename(fileImage.filename)
 
-            Log.D(f'Upload VNF form data - Name: {form.name.data}, Description: {form.description.data}'
-                  f', VNFD {fileVNFDName}, image: {fileImageName}')
+            Log.D(f'Upload VNF form data - Name: {form.name.data}, Description: {form.description.data}, '
+                  f'VNFD {fileVNFDName}, image: {fileImageName}')
 
             newVNF: VNF = VNF(name=form.name.data, author=current_user, description=form.description.data,
                           VNFD=fileVNFDName, image=fileImageName)
@@ -51,11 +53,12 @@ def upload():
             db.session.commit()
             Log.I(f'Added VNF {newVNF.name}')
             action: Action = Action(timestamp=datetime.utcnow(), author=current_user,
-                            message=f'<a href="/VNF/repository">Uploaded VNF: {newVNF.name}</a>')
+                                    message=f'<a href="/VNF/repository">Uploaded VNF: {newVNF.name}</a>')
             Log.I(f'Added action - Uploaded VNF')
             db.session.add(action)
             db.session.commit()
 
+            # Store VNFD and Image files
             baseFolder = os.path.join(UploaderConfig.UPLOAD_FOLDER, 'vnfs', str(newVNF.id))
             os.makedirs(os.path.join(baseFolder, "vnfd"), mode=0o755, exist_ok=True)
             os.makedirs(os.path.join(baseFolder, "images"), mode=0o755, exist_ok=True)
@@ -79,6 +82,8 @@ def delete(vnfId: int):
         if vnf.user_id == current_user.id:
             db.session.delete(vnf)
             db.session.commit()
+
+            # Remove stored files
             shutil.rmtree(os.path.join(UploaderConfig.UPLOAD_FOLDER, 'vnfs', str(vnfId)))
             Log.I(f'VNF {vnfId} successfully removed')
             flash(f'The VNF has been successfully removed', 'info')

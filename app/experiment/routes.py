@@ -20,17 +20,20 @@ def create():
     listUEs: List[str] = list(Config().UEs.keys())
     vnfs: List[str] = []
     vnfsId: List[int] = []
+
+    # Get User's VNFs
     if current_user.userVNFs():
         for vnf in current_user.userVNFs():
             vnfs.append(vnf.name)
             vnfsId.append(vnf.id)
+
     form = ExperimentForm()
     if form.validate_on_submit():
         testCases = request.form.getlist('testCases')
-        ues_selected = request.form.getlist('ues')
         if not testCases:
             flash(f'Please, select at least one Test Case', 'error')
             return redirect(url_for('main.create'))
+        ues_selected = request.form.getlist('ues')
 
         Log.D(f'Create experiment form data - Name: {form.name.data}, Type: {form.type.data}'
               f', TestCases {testCases}, UEs: {ues_selected}, Slice: {request.form.get("slice", None)}')
@@ -45,6 +48,7 @@ def create():
         db.session.commit()
         Log.I(f'Added experiment {experiment.id}')
 
+        # Manage multiple VNF-Location selection
         if 'vnfCount' in request.form:
             count = int(request.form['vnfCount'])
         else:
@@ -61,6 +65,7 @@ def create():
         baseFolder = os.path.join(UploaderConfig.UPLOAD_FOLDER, 'experiment', str(experiment.id))
         os.makedirs(os.path.join(baseFolder, "nsd"), mode=0o755, exist_ok=True)
 
+        # Store NSD file
         if 'fileNSD' in request.files:
             fileNSD = request.files['fileNSD']
             if fileNSD.filename != '':
@@ -86,18 +91,22 @@ def create():
 @bp.route('/<experimentId>', methods=['GET', 'POST'])
 @login_required
 def experiment(experimentId: int):
-    exp: Experiment = Experiment.query.get(experimentId)
-    formRun = RunExperimentForm()
     config = Config()
+    exp: Experiment = Experiment.query.get(experimentId)
+
+    formRun = RunExperimentForm()
     if formRun.validate_on_submit():
         runExperiment(config)
         return redirect(f"{request.url}/reload")
+
     if exp is None:
-        Log.I(f'experiment not found')
-        flash(f'experiment not found', 'error')
+        Log.I(f'Experiment not found')
+        flash(f'Experiment not found', 'error')
         return redirect(url_for('main.index'))
     else:
         if exp.user_id is current_user.id:
+
+            # Get Experiment's executions
             executions: List[Experiment] = exp.experimentExecutions()
             if executions.count() == 0:
                 flash(f'The experiment {exp.name} doesn\'t have any executions yet', 'info')
@@ -120,17 +129,19 @@ def runExperiment(config: Config):
         Log.I(f'Ran experiment {request.form["id"]}')
         flash(f'Success: {jsonResponse["Success"]} - Execution Id: '
               f'{jsonResponse["ExecutionId"]} - Message: {jsonResponse["Message"]}', 'info')
-        execution: Execution = Execution(id=jsonResponse["ExecutionId"], experiment_id=request.form['id'],
-                              status='Init')
+
+        execution: Execution = Execution(id=jsonResponse["ExecutionId"], experiment_id=request.form['id'], status='Init')
         db.session.add(execution)
         db.session.commit()
         Log.I(f'Added execution {jsonResponse["ExecutionId"]}')
+
         exp: Experiment = Experiment.query.get(execution.experiment_id)
         action = Action(timestamp=datetime.utcnow(), author=current_user,
                         message=f'<a href="/execution/{execution.id}">Ran experiment: {exp.name}</a>')
         db.session.add(action)
         db.session.commit()
         Log.I(f'Added action - Ran experiment')
+
     except Exception as e:
         Log.E(f'Error running expermient: {e}')
         flash(f'Exception while trying to connect with dispatcher: {e}', 'error')

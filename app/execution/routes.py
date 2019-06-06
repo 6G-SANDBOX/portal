@@ -14,21 +14,22 @@ from REST import DispatcherApi
 def execution(executionId: int):
     exe: Execution = Execution.query.get(executionId)
     if exe is None:
-        Log.I(f'execution not found')
-        flash(f'execution not found', 'error')
+        Log.I(f'Execution not found')
+        flash(f'Execution not found', 'error')
         return redirect(url_for('main.index'))
     else:
         exp: Experiment = Experiment.query.get(exe.experiment_id)
         if exp.user_id is current_user.id:
             try:
+                # Get Execution logs information
                 config = Config()
                 api = DispatcherApi(config.Dispatcher.Host, config.Dispatcher.Port, "/experiment")
                 jsonResponse: Dict = api.Get(executionId)
                 Log.D(f'Access exeuction logs response {jsonResponse}')
                 status = jsonResponse["Status"]
                 if status == 'Not Found':
-                    Log.I(f'execution not found')
-                    flash(f'execution not found', 'error')
+                    Log.I(f'Execution not found')
+                    flash(f'Execution not found', 'error')
                     return redirect(url_for('main.index'))
                 else:
                     executor = LogInfo(jsonResponse["Executor"])

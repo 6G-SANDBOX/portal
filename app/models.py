@@ -117,13 +117,15 @@ class Experiment(db.Model):
         return vnfs.order_by(VNFLocation.id.asc())
 
     def serialization(self) -> Dict[str, object]:
-        executionIds: List = [exe.id for exe in self.experimentExecutions()]
         ueDictionary = {}
+        vnfsLocations = []
         allUEs: List = HelperConfig().UEs
+        executionIds: List = [exe.id for exe in self.experimentExecutions()]
+
         if self.ues:
             for ue in self.ues:
                 if ue in allUEs.keys(): ueDictionary[ue] = allUEs[ue]
-        vnfsLocations = []
+
         for vnfLoc in self.experimentVNFs():
             vnfLocation: Dict[str, object] = VNF.query.get(vnfLoc.VNF_id).serialization()
             vnfLocation['Location'] = vnfLoc.location
