@@ -32,6 +32,7 @@ function update{{ execution.id }}(nanobar) {
         }
     );
 }
+
 </script>
 <script>
 div = $(
@@ -42,6 +43,7 @@ div = $(
 $('#progress{{ execution.id }}').append(div);
 var nanobar = Nanobar({ target: div[1] });
 update{{ execution.id }}(nanobar);
+
 </script>
 {% endif %}
 {% endblock %}
@@ -96,7 +98,7 @@ update{{ execution.id }}(nanobar);
             {% if execution.end_time%}
             {{ moment(execution.end_time).format('DD MMMM YYYY, h:mm:ss') }}
             {% else %}
-               -
+            -
             {% endif %}
         </td>
         <td class="col-md-3">

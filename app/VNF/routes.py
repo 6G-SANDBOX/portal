@@ -42,15 +42,13 @@ def upload():
         if fileVNFD and fileImage:
             fileVNFDName = secure_filename(fileVNFD.filename)
             fileImageName = secure_filename(fileImage.filename)
-
             Log.D(f'Upload VNF form data - Name: {form.name.data}, Description: {form.description.data}, '
                   f'VNFD {fileVNFDName}, image: {fileImageName}')
-
             newVNF: VNF = VNF(name=form.name.data, author=current_user, description=form.description.data,
-                          VNFD=fileVNFDName, image=fileImageName)
-
+                              VNFD=fileVNFDName, image=fileImageName)
             db.session.add(newVNF)
             db.session.commit()
+
             Log.I(f'Added VNF {newVNF.name}')
             action: Action = Action(timestamp=datetime.utcnow(), author=current_user,
                                     message=f'<a href="/VNF/repository">Uploaded VNF: {newVNF.name}</a>')
@@ -69,6 +67,7 @@ def upload():
 
             flash('Your VNF has been successfully uploaded', 'info')
             return redirect(url_for('VNF.repository'))
+
         Log.I('Can\'t upload VNF. There are files missing')
         flash('There are files missing', 'error')
     return render_template('VNF/upload.html', title='Home', form=form)
@@ -87,9 +86,12 @@ def delete(vnfId: int):
             shutil.rmtree(os.path.join(UploaderConfig.UPLOAD_FOLDER, 'vnfs', str(vnfId)))
             Log.I(f'VNF {vnfId} successfully removed')
             flash(f'The VNF has been successfully removed', 'info')
+
         else:
             Log.I(f'Forbidden - User {current_user.name} don\'t have permission to remove VNF {vnfId}')
             flash(f'Forbidden - You don\'t have permission to remove this VNF', 'error')
+
     else:
         return render_template('errors/404.html'), 404
+
     return redirect(url_for('VNF.repository'))

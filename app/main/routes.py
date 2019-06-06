@@ -17,7 +17,6 @@ def index():
     notices: List[str] = config.Notices
     actions: List[Action] = User.query.get(current_user.id).userActions()
     experiments: List[Experiment] = current_user.userExperiments()
-
     formRun = RunExperimentForm()
     if formRun.validate_on_submit():
         runExperiment(config)

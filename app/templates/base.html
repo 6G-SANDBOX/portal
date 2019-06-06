@@ -20,6 +20,7 @@
     window.setTimeout(function() {
         $(".alert_message").fadeTo(500, 0).slideUp(500, function(){ $(this).remove(); });
     }, 4000);
+
 </script>
 {% endblock %}
 
@@ -35,10 +36,14 @@
                 <span class="icon-bar"></span>
             </button>
             {% if current_user.is_anonymous %}
-            <a href="{{ url_for('authentication.login') }}"><img src=" {{ url_for('static', filename='images/5genesisTransparent.png') }} " alt="5Genesis" height="50" width="39" style="float: left; padding: 5px"></a>
+            <a href="{{ url_for('authentication.login') }}"><img
+                    src=" {{ url_for('static', filename='images/5genesisTransparent.png') }} " alt="5Genesis"
+                    height="50" width="39" style="float: left; padding: 5px"></a>
             <a class="navbar-brand" href="{{ url_for('authentication.login') }}">5Genesis</a>
             {% else %}
-            <a href="{{ url_for('main.index') }}"><img src="{{ url_for('static', filename='images/5genesisTransparent.png') }}" alt="5Genesis" height="50" width="39" style="float: left; padding: 5px"></a>
+            <a href="{{ url_for('main.index') }}"><img
+                    src="{{ url_for('static', filename='images/5genesisTransparent.png') }}" alt="5Genesis" height="50"
+                    width="39" style="float: left; padding: 5px"></a>
             <a class="navbar-brand" href="{{ url_for('main.index') }}">5Genesis</a>
             {% endif %}
         </div>

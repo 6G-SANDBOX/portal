@@ -33,6 +33,7 @@ def create():
         if not testCases:
             flash(f'Please, select at least one Test Case', 'error')
             return redirect(url_for('main.create'))
+
         ues_selected = request.form.getlist('ues')
 
         Log.D(f'Create experiment form data - Name: {form.name.data}, Type: {form.type.data}'
@@ -51,12 +52,15 @@ def create():
         # Manage multiple VNF-Location selection
         if 'vnfCount' in request.form:
             count = int(request.form['vnfCount'])
+
         else:
             count = 0
+
         for i in range(count):
-            loc = 'location'+str(i+1)
-            vnf = 'VNF'+str(i+1)
-            vnfLoc: VNFLocation = VNFLocation(location=request.form[loc], VNF_id=request.form[vnf], experiment_id=experiment.id)
+            loc = 'location' + str(i + 1)
+            vnf = 'VNF' + str(i + 1)
+            vnfLoc: VNFLocation = VNFLocation(location=request.form[loc], VNF_id=request.form[vnf],
+                                              experiment_id=experiment.id)
             Log.D(f'Selected VNF {request.form[vnf]} with location {request.form[loc]}')
             db.session.add(vnfLoc)
             db.session.commit()
@@ -75,14 +79,15 @@ def create():
                 db.session.add(experiment)
                 db.session.commit()
                 Log.I(f'Added NSD file {fileNSDName} to experiment {experiment.id}')
-        
+
         action: Action = Action(timestamp=datetime.utcnow(), author=current_user,
-                        message=f'<a href="/experiment/{experiment.id}">Created experiment: {form.name.data}</a>')
+                                message=f'<a href="/experiment/{experiment.id}">Created experiment: {form.name.data}</a>')
         db.session.add(action)
         db.session.commit()
         Log.I(f'Added action - Created experiment')
         flash('Your experiment has been successfully created', 'info')
         return redirect(url_for('main.index'))
+
     return render_template('experiment/create.html', title='Home', form=form, testCaseList=Config().TestCases,
                            ueList=listUEs, sliceList=Config().Slices, vnfs=vnfs, vnfsId=vnfsId)
 
@@ -93,7 +98,6 @@ def create():
 def experiment(experimentId: int):
     config = Config()
     exp: Experiment = Experiment.query.get(experimentId)
-
     formRun = RunExperimentForm()
     if formRun.validate_on_submit():
         runExperiment(config)
@@ -103,6 +107,7 @@ def experiment(experimentId: int):
         Log.I(f'Experiment not found')
         flash(f'Experiment not found', 'error')
         return redirect(url_for('main.index'))
+
     else:
         if exp.user_id is current_user.id:
 
@@ -111,10 +116,11 @@ def experiment(experimentId: int):
             if executions.count() == 0:
                 flash(f'The experiment {exp.name} doesn\'t have any executions yet', 'info')
                 return redirect(url_for('main.index'))
+
             else:
                 return render_template('experiment/experiment.html', title='experiment', experiment=exp,
                                        executions=executions, formRun=formRun, grafanaUrl=config.GrafanaUrl,
-                                       executionId=getLastExecution()+1)
+                                       executionId=getLastExecution() + 1)
         else:
             Log.I(f'Forbidden - User {current_user.name} don\'t have permission to access experiment {experimentId}')
             flash(f'Forbidden - You don\'t have permission to access this experiment', 'error')
@@ -129,12 +135,12 @@ def runExperiment(config: Config):
         Log.I(f'Ran experiment {request.form["id"]}')
         flash(f'Success: {jsonResponse["Success"]} - Execution Id: '
               f'{jsonResponse["ExecutionId"]} - Message: {jsonResponse["Message"]}', 'info')
-
-        execution: Execution = Execution(id=jsonResponse["ExecutionId"], experiment_id=request.form['id'], status='Init')
+        execution: Execution = Execution(id=jsonResponse["ExecutionId"], experiment_id=request.form['id'],
+                                         status='Init')
         db.session.add(execution)
         db.session.commit()
-        Log.I(f'Added execution {jsonResponse["ExecutionId"]}')
 
+        Log.I(f'Added execution {jsonResponse["ExecutionId"]}')
         exp: Experiment = Experiment.query.get(execution.experiment_id)
         action = Action(timestamp=datetime.utcnow(), author=current_user,
                         message=f'<a href="/execution/{execution.id}">Ran experiment: {exp.name}</a>')

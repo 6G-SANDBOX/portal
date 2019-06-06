@@ -13,6 +13,7 @@ from Helper import Config, Log
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
+
     form = RegistrationForm()
     if form.validate_on_submit():
         Log.D(f'Registration form data - Username: {form.username.data}, Email: {form.email.data},'
@@ -24,6 +25,7 @@ def register():
         flash('You have been registered', 'info')
         Log.I(f'Registered user: {user.username}')
         return redirect(url_for('authentication.login'))
+
     return render_template('authentication/register.html', title='Register', form=form,
                            description=Config().Description)
 
@@ -33,6 +35,7 @@ def login():
     if current_user.is_authenticated:
         Log.I(f'The user is already authenticated')
         return redirect(url_for('main.index'))
+
     form = LoginForm()
     if form.validate_on_submit():
         user: User = User.query.filter_by(username=form.username.data).first()
@@ -40,12 +43,14 @@ def login():
             Log.I(f'Invalid username or password')
             flash('Invalid username or password', 'error')
             return redirect(url_for('authentication.login'))
+
         login_user(user, remember=form.rememberMe.data)
         Log.I(f'User {user.username} logged in')
         nextPage = request.args.get('next')
         if not nextPage or url_parse(nextPage).netloc != '':
             nextPage = url_for('main.index')
         return redirect(nextPage)
+
     return render_template('authentication/login.html', title='Sign In', form=form,
                            description=Config().Description)
 
@@ -61,13 +66,16 @@ def logout():
 def resetPasswordRequest():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
+
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
         user: User = User.query.filter_by(email=form.email.data).first()
         if user:
             sendPasswordResetEmail(user)
+
         flash('Check your email for the instructions to reset your password', 'info')
         return redirect(url_for('authentication.login'))
+
     return render_template('authentication/resetPasswordRequest.html',
                            title='Reset Password', form=form, description=Config().Description)
 
@@ -77,10 +85,12 @@ def resetPassword(token: str):
     if current_user.is_authenticated:
         Log.I(f'The user is already authenticated')
         return redirect(url_for('main.index'))
+
     user: User = User.verifyResetPasswordToken(token)
     if not user:
         Log.I(f'Reset password token do not match any user')
         return redirect(url_for('main.index'))
+
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user.setPassword(form.password.data)
@@ -88,4 +98,5 @@ def resetPassword(token: str):
         flash('Your password has been reset.', 'info')
         Log.I(f'Password reset for {user.name}')
         return redirect(url_for('authentication.login'))
+
     return render_template('authentication/resetPassword.html', form=form, description=Config().Description)

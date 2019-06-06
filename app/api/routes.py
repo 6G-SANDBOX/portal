@@ -20,18 +20,23 @@ def setExecutionStatus(executionId: int) -> Dict[str, str]:
                 execution.start_time = datetime.utcnow()
             elif data["Status"] in ['Finished', 'Cancelled', 'Errored']:
                 execution.end_time = datetime.utcnow()
+
             execution.status = data["Status"]
             Log.I(f'Execution {str(execution.id)}: Status changed to {execution.status}')
+
         if 'Dashboard' in data:
             execution.dashboard_url = str(data["Dashboard"])
             Log.I(f'Execution {str(execution.id)}: Dasboard URL assigned: {execution.dashboard_url}')
+
         if 'PerCent' in data:
             execution.percent = data["PerCent"]
             Log.I(f'Execution {str(execution.id)}: Percent - {str(execution.percent)}%')
+
         if 'Message' in data:
             execution.message = str(data["Message"])
             Log.I(f'Execution {str(execution.id)}: Message - {str(execution.message)}')
         db.session.commit()
+
     return jsonify({'Status': 'Success'})
 
 
@@ -44,9 +49,8 @@ def executionJson(executionId: int) -> Dict[str, object]:
         status = execution.status
         percent = execution.percent
         message = execution.message
-    return jsonify({
-        'Status': status, 'PerCent': percent, 'Message': message
-    })
+
+    return jsonify({'Status': status, 'PerCent': percent, 'Message': message})
 
 
 @bp.route('/nextExecutionId')

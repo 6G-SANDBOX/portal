@@ -17,6 +17,7 @@ function checkNewExecutions(){
     );
 }
 setInterval(checkNewExecutions, 5000)
+
 </script>
 {% for exe in executions %}
 {% if exe.status not in ['Finished', 'Cancelled', 'Errored'] %}
@@ -38,6 +39,7 @@ function update{{ exe.id }}(nanobar) {
         }
     );
 }
+
 </script>
 <script>
 div = $(
@@ -48,6 +50,7 @@ div = $(
 $('#progress{{ exe.id }}').append(div);
 var nanobar = Nanobar({ target: div[1] });
 update{{ exe.id }}(nanobar);
+
 </script>
 {% endif %}
 {% endfor %}

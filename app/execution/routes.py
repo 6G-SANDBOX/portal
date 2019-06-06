@@ -17,6 +17,7 @@ def execution(executionId: int):
         Log.I(f'Execution not found')
         flash(f'Execution not found', 'error')
         return redirect(url_for('main.index'))
+
     else:
         exp: Experiment = Experiment.query.get(exe.experiment_id)
         if exp.user_id is current_user.id:
@@ -31,17 +32,18 @@ def execution(executionId: int):
                     Log.I(f'Execution not found')
                     flash(f'Execution not found', 'error')
                     return redirect(url_for('main.index'))
+
                 else:
                     executor = LogInfo(jsonResponse["Executor"])
                     postRun = LogInfo(jsonResponse["PostRun"])
                     preRun = LogInfo(jsonResponse["PreRun"])
                     return render_template('execution/execution.html', title='execution', execution=exe,
                                            executor=executor, postRun=postRun, preRun=preRun, experiment=exp,
-                                           grafanaUrl=config.GrafanaUrl, executionId=getLastExecution()+1)
+                                           grafanaUrl=config.GrafanaUrl, executionId=getLastExecution() + 1)
             except Exception as e:
                 Log.E(f'Error accessing execution{exe.experiment_id}: {e}')
                 flash(f'Exception while trying to connect with dispatcher: {e}', 'error')
-                return Experiment.experiment(exe.experiment_id)
+                return redirect(f"experiment/{exe.experiment_id}")
         else:
             Log.I(f'Forbidden - User {current_user.name} don\'t have permission to access execution{executionId}')
             flash(f'Forbidden - You don\'t have permission to access this execution', 'error')
