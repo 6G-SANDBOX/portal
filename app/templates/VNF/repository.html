@@ -10,20 +10,21 @@
     document.getElementById('navbar-createExperiment').classList.remove('menuSelected');
 })();
 
-function confirmDelete(VNF_id){
+function confirmDelete(VNFId){
     if (window.confirm("Do you really want to remove the VNF?")) {
-        window.location.replace("/VNF/delete/"+VNF_id);
+        window.location.replace("/VNF/delete/"+VNFId);
     }
 }
+
 </script>
 {% endblock %}
 
 {% macro accordionCard(accordion, card, VNFInfo) %}
 <div class="card">
-    <div class = "panel panel-info">
+    <div class="panel panel-info">
         <div class="panel-heading" id="{{ card }}Header" style="padding: 0px !important">
             <button class="btn btn-panel" type="button" data-toggle="collapse" style="width: 100%;"
-                    data-target="#{{ card }}_VNF" aria-expanded="false" aria-controls="{{ card }}_VNF" >
+                    data-target="#{{ card }}_VNF" aria-expanded="false" aria-controls="{{ card }}_VNF">
                 <b>VNF:</b> {{ VNFInfo.name }}
             </button>
         </div>
@@ -37,8 +38,8 @@ function confirmDelete(VNF_id){
 {% endmacro %}
 
 {% block app_content %}
-<div class="col-sm-2" ></div>
-<div class="col-sm-8" >
+<div class="col-sm-2"></div>
+<div class="col-sm-8">
     <div style="text-align: center">
         <h2>VNF REPOSITORY</h2>
     </div>
@@ -51,7 +52,7 @@ function confirmDelete(VNF_id){
         {% endfor %}
     </div>
 </div>
-<div class="col-sm-2" ></div>
+<div class="col-sm-2"></div>
 {% endblock %}
 
 

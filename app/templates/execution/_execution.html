@@ -22,22 +22,24 @@
         {{ moment(execution.start_time).format('DD MMMM YYYY, h:mm:ss') }}
     </td>
     <td class="col-md-2">
-            {% if execution.end_time%}
-            {{ moment(execution.end_time).format('DD MMMM YYYY, h:mm:ss') }}
-            {% else %}
-               -
-            {% endif %}
+        {% if execution.end_time %}
+        {{ moment(execution.end_time).format('DD MMMM YYYY, h:mm:ss') }}
+        {% else %}
+        -
+        {% endif %}
     </td>
     <td class="col-md-3">
         {% if execution.status not in ['Finished', 'Cancelled', 'Errored'] %}
-        <a class="btn btn-darkBlue btn-sm" href="/execution/{{ execution.id }}/reloadLog" role="button">Execution Logs</a>
+        <a class="btn btn-darkBlue btn-sm" href="/execution/{{ execution.id }}/reloadLog" role="button">Execution
+            Logs</a>
         {% else %}
         <a class="btn btn-darkBlue btn-sm" href="/execution/{{ execution.id }}" role="button">Execution Logs</a>
         {% endif %}
-        {% if grafana_url == None or not execution.dashboard_url %}
+        {% if grafanaUrl == None or not execution.dashboard_url %}
         <a class="btn btn-primary btn-sm disabled" href="#" role="button">Results</a>
         {% else %}
-        <a class="btn btn-blue btn-sm" href="{{ grafana_url }}{{ execution.dashboard_url }}" role="button" target="_blank">Results</a>
+        <a class="btn btn-blue btn-sm" href="{{ grafanaUrl }}{{ execution.dashboard_url }}" role="button"
+           target="_blank">Results</a>
         {% endif %}
     </td>
 </tr>

@@ -3,6 +3,7 @@
 
 {% block scripts %}
 {{ super() }}
+<script src="{{url_for('static', filename='js/loading.js')}}"></script>
 <script src="{{url_for('static', filename='js/updateExecutionStatus.js')}}"></script>
 <script>
 function checkNewExecutions(){
@@ -16,12 +17,13 @@ function checkNewExecutions(){
     );
 }
 setInterval(checkNewExecutions, 5000)
+
 </script>
 {% for exe in executions %}
 {% if exe.status not in ['Finished', 'Cancelled', 'Errored'] %}
 <script>
 function update{{ exe.id }}(nanobar) {
-    $.get("{{ url_for('api.execution_json', executionId=exe.id) }}")
+    $.get("{{ url_for('api.executionJson', executionId=exe.id) }}")
         .done(function (response) {
             if (response['Status'] === 'Finished'){
                 updateOne($("#table_status{{ exe.id }}"), response['Status']);
@@ -37,6 +39,7 @@ function update{{ exe.id }}(nanobar) {
         }
     );
 }
+
 </script>
 <script>
 div = $(
@@ -47,6 +50,7 @@ div = $(
 $('#progress{{ exe.id }}').append(div);
 var nanobar = Nanobar({ target: div[1] });
 update{{ exe.id }}(nanobar);
+
 </script>
 {% endif %}
 {% endfor %}

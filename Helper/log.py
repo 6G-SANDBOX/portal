@@ -96,19 +96,24 @@ class Log:
             print(f"[Log not initialized][{level}] {msg}")
 
     @classmethod
-    def D(cls, msg): cls._dump('DEBUG', msg)
+    def D(cls, msg):
+        cls._dump('DEBUG', msg)
 
     @classmethod
-    def I(cls, msg): cls._dump('INFO', msg)
+    def I(cls, msg):
+        cls._dump('INFO', msg)
 
     @classmethod
-    def W(cls, msg): cls._dump('WARNING', msg)
+    def W(cls, msg):
+        cls._dump('WARNING', msg)
 
     @classmethod
-    def E(cls, msg): cls._dump('ERROR', msg)
+    def E(cls, msg):
+        cls._dump('ERROR', msg)
 
     @classmethod
-    def C(cls, msg): cls._dump('CRITICAL', msg)
+    def C(cls, msg):
+        cls._dump('CRITICAL', msg)
 
     @staticmethod
     def State(condition: bool) -> str:
