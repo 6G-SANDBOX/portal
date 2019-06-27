@@ -4,6 +4,17 @@
 
  - [Python 3.7.x](https://www.python.org)
  - [Optional] [Grafana](https://grafana.com/) (tested on version 5.4)
+ - [Optional] [Grafana reporter](https://github.com/IzakMarais/reporter) 
+ (tested on version 2.1.0, commit 41b38a0, see ELCM readme for more information)
+ 
+## Interoperability with other components
+
+The following information specifies the version that most closely match the expected behavior when this package interacts
+with others developed internally in 5 Genesis (i.e. the version that was available during the development and that was 
+used while testing this component). It's possible that most (or all) features work with some previous versions, and most
+probably there will be no issues when using more recent versions.
+
+ - [ELCM](https://gitlab.fokus.fraunhofer.de/5genesis/elcm) Version 1.0.5 (27/06/2019)
 
 ## Installing (development)
 > A video detailing the deployment procedure of the Portal (and ELCM) can be seen [in BSCW](https://bscw.fokus.fraunhofer.de/bscw/bscw.cgi/d3208170/Coordinationlayer_call20190422.mp4)
