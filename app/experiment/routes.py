@@ -133,8 +133,7 @@ def downloadNSD(experimentId: int):
     if file is None:
         return render_template('errors/404.html'), 404
     else:
-        baseFolder = os.path.join(bp.root_path, '..', '..', UploaderConfig.UPLOAD_FOLDER, 'experiment',
-                                  str(experimentId), 'nsd')
+        baseFolder = os.path.realpath(os.path.join(UploaderConfig.UPLOAD_FOLDER, 'experiment', str(experimentId),'nsd'))
         return send_from_directory(directory=baseFolder, filename=file, as_attachment=True)
 
 
