@@ -127,20 +127,15 @@ def experiment(experimentId: int):
             return redirect(url_for('main.index'))
 
 
-@bp.route('/<experimentId>/nsdFile', methods=['GET', 'POST'])
-@login_required
+@bp.route('/<experimentId>/nsdFile', methods=['GET'])
 def downloadNSD(experimentId: int):
-    rootFolder = bp.root_path.replace('\\app\\experiment', '')
-    baseFolder = os.path.join(rootFolder, UploaderConfig.UPLOAD_FOLDER, 'experiment', str(experimentId), 'nsd')
-    files = []
-    for filename in os.listdir(baseFolder):
-        path = os.path.join(baseFolder, filename)
-        if os.path.isfile(path):
-            files.append(filename)
-    if not files:
+    file = Experiment.query.get(experimentId).NSD
+    if file is None:
         return render_template('errors/404.html'), 404
     else:
-        return send_from_directory(directory=baseFolder, filename=files[0], as_attachment=True)
+        baseFolder = os.path.join(bp.root_path, '..', '..', UploaderConfig.UPLOAD_FOLDER, 'experiment',
+                                  str(experimentId), 'nsd')
+        return send_from_directory(directory=baseFolder, filename=file, as_attachment=True)
 
 
 def runExperiment(config: Config):
