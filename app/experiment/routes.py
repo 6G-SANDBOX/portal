@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 from typing import Dict, List
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, send_from_directory
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 from config import Config as UploaderConfig
@@ -125,6 +125,16 @@ def experiment(experimentId: int):
             Log.I(f'Forbidden - User {current_user.name} don\'t have permission to access experiment {experimentId}')
             flash(f'Forbidden - You don\'t have permission to access this experiment', 'error')
             return redirect(url_for('main.index'))
+
+
+@bp.route('/<experimentId>/nsdFile', methods=['GET'])
+def downloadNSD(experimentId: int):
+    file = Experiment.query.get(experimentId).NSD
+    if file is None:
+        return render_template('errors/404.html'), 404
+    else:
+        baseFolder = os.path.realpath(os.path.join(UploaderConfig.UPLOAD_FOLDER, 'experiment', str(experimentId),'nsd'))
+        return send_from_directory(directory=baseFolder, filename=file, as_attachment=True)
 
 
 def runExperiment(config: Config):
