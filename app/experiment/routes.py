@@ -8,7 +8,7 @@ from config import Config as UploaderConfig
 from REST import DispatcherApi
 from app import db
 from app.experiment import bp
-from app.models import Experiment, Execution, Action, VNFLocation
+from app.models import Experiment, Execution, Action
 from app.experiment.forms import ExperimentForm, RunExperimentForm
 from app.execution.routes import getLastExecution
 from Helper import Config, Log

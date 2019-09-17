@@ -43,6 +43,7 @@ class User(UserMixin, db.Model):
     experiments = db.relationship('Experiment', backref='author', lazy='dynamic')
     actions = db.relationship('Action', backref='author', lazy='dynamic')
     VNFs = db.relationship('VNF', backref='author', lazy='dynamic')
+    NSs = db.relationship('NS', backref='author', lazy='dynamic')
 
     def __repr__(self):
         return f'<Id: {self.id}, Username: {self.username}, Email: {self.email}, Organization: {self.organization}'
@@ -69,6 +70,10 @@ class User(UserMixin, db.Model):
     def userVNFs(self) -> List:
         VNFs: List = VNF.query.filter_by(user_id=self.id).order_by(VNF.id)
         return VNFs
+
+    def userNSs(self) -> List:
+        NSs: List = NS.query.filter_by(user_id=self.id).order_by(NS.id)
+        return NSs
 
     @staticmethod
     def verifyResetPasswordToken(token):
@@ -101,7 +106,6 @@ class Experiment(db.Model):
     ues = db.Column(JSONEncodedDict)
     NSD = db.Column(db.String(256))
     slice = db.Column(db.String(64))
-    vnflocations = db.relationship('VNFLocation', backref='experiment', lazy='dynamic')
     executions = db.relationship('Execution', backref='experiment', lazy='dynamic')
 
     def __repr__(self):
@@ -111,10 +115,6 @@ class Experiment(db.Model):
     def experimentExecutions(self) -> List:
         exp: List = Execution.query.filter_by(experiment_id=self.id)
         return exp.order_by(Execution.id.desc())
-
-    def experimentVNFs(self) -> List:
-        vnfs: List = VNFLocation.query.filter_by(experiment_id=self.id)
-        return vnfs.order_by(VNFLocation.id.asc())
 
     def serialization(self) -> Dict[str, object]:
         ueDictionary = {}
@@ -172,7 +172,6 @@ class VNF(db.Model):
     VNFD = db.Column(db.String(256))
     image = db.Column(db.String(256))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    vnf_locations = db.relationship('VNFLocation', backref='vnf_file', lazy='dynamic')
 
     def __repr__(self):
         return f'<VNF: {self.id}, Name: {self.name}, Description: {self.description}, VNFD: {self.VNFD},' \
@@ -184,11 +183,18 @@ class VNF(db.Model):
         return dictionary
 
 
-class VNFLocation(db.Model):
+class NS(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    location = db.Column(db.String(32))
-    VNF_id = db.Column(db.Integer, db.ForeignKey('VNF.id'))
-    experiment_id = db.Column(db.Integer, db.ForeignKey('experiment.id'))
+    name = db.Column(db.String(64))
+    description = db.Column(db.String(256))
+    NSD = db.Column(db.String(256))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
-        return f'<Id: {self.id}, VNF_id: {self.VNF_id}, Location: {self.location}, Experiment_id: {self.experiment_id}>'
+        return f'<NS: {self.id}, Name: {self.name}, Description: {self.description}, NSD: {self.NSD},' \
+            f'User_id: {self.user_id}>'
+
+    def serialization(self) -> Dict[str, object]:
+        dictionary = {'Id': self.id, 'Name': self.name, 'Description': self.description, 'NSD': self.NSD,
+                      "Image": self.image, "User": self.user_id}
+        return dictionary
