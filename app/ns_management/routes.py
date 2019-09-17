@@ -21,101 +21,132 @@ def repository():
     return render_template('ns_management/repository.html', title='Home', VNFs=VNFs, NSs=NSs)
 
 
+def _store(file, baseFolder, subfolder, entityId) -> str:
+    filename = secure_filename(file.filename)
+    baseFolder = os.path.join(UploaderConfig.UPLOAD_FOLDER, baseFolder, entityId)
+    os.makedirs(os.path.join(baseFolder, subfolder), mode=0o755, exist_ok=True)
+    savePath = os.path.join(baseFolder, subfolder, filename)
+    file.save(savePath)
+    Log.D(f'Saved file {file.filename} in {savePath}')
+    return filename
+
+
 @bp.route('/uploadNs', methods=['GET', 'POST'])
 @login_required
 def upload_NS():
     form = NSForm()
     if form.validate_on_submit():
-
         # Check if files were uploaded correctly
-        if 'fileNSD' not in request.files:
+        fileNSD = request.files.get('fileNSD', None)
+        if fileNSD is None or fileNSD.filename == '':
             Log.I('Can\'t upload NS. There are files missing')
             flash('There are files missing', 'error')
             return redirect(request.url)
-
-        fileNSD = request.files['fileNSD']
-
-        if fileNSD.filename == '':
-            flash('There are files missing', 'error')
-            return redirect(request.url)
-
-        if fileNSD:
-            fileNSDName = secure_filename(fileNSD.filename)
-            Log.D(f'Upload NSD form data - Name: {form.name.data}, Description: {form.description.data}, '
-                  f'NSD {fileNSDName}')
-            newNS: NS = NS(name=form.name.data, author=current_user, description=form.description.data,
-                              NSD=fileNSDName)
-            db.session.add(newNS)
+        else:
+            Log.D(f'Upload NS form data - Name: {form.name.data}, Description: {form.description.data}, '
+                  f'NDS {fileNSD.filename}')
+            newNs = NS(name=form.name.data, author=current_user, description=form.description.data)
+            db.session.add(newNs)
             db.session.commit()
 
-            Log.I(f'Added VNF {newNS.name}')
+            newNs.NSD = _store(fileNSD, 'nss', 'nsd', str(newNs.id))
+            db.session.add(newNs)
+            db.session.commit()
+            Log.I(f'Saved NS: {str(newNs)}')
+
             action: Action = Action(timestamp=datetime.utcnow(), author=current_user,
-                                    message=f'<a href="/VNF/repository">Uploaded VNF: {newNS.name}</a>')
+                                    message=f'<a href="/NS/repository">Uploaded NS: {newNs.name}</a>')
             Log.I(f'Added action - Uploaded NS')
             db.session.add(action)
             db.session.commit()
 
-            # Store VNFD and Image files
-            baseFolder = os.path.join(UploaderConfig.UPLOAD_FOLDER, 'nss', str(newNS.id))
-            os.makedirs(os.path.join(baseFolder, "nss"), mode=0o755, exist_ok=True)
-            fileNSD.save(os.path.join(baseFolder, "nss", fileNSDName))
-            Log.D(f'Saved NSD file {fileNSDName} in NS {newNS.id}')
-
-            flash('Your NS has been successfully uploaded', 'info')
+            flash('Your VNF has been successfully uploaded', 'info')
             return redirect(url_for('NsManagement.repository'))
 
-        Log.I('Can\'t upload NS. There are files missing')
-        flash('There are files missing', 'error')
     return render_template('ns_management/upload_ns.html', title='Home', form=form)
+
 
 @bp.route('/uploadVnf', methods=['GET', 'POST'])
 @login_required
 def upload_VNF():
     form = VNFForm()
     if form.validate_on_submit():
+        fileVNFD = request.files.get('fileVNFD', None)
+        fileImage = request.files.get('fileImage', None)
 
-        # Check if files were uploaded correctly
-        if 'fileVNFD' not in request.files or 'fileImage' not in request.files:
+        if fileVNFD is None or fileVNFD.filename == '' \
+            or fileImage is None or fileImage.filename == '':
             Log.I('Can\'t upload VNF. There are files missing')
             flash('There are files missing', 'error')
             return redirect(request.url)
-
-        fileVNFD = request.files['fileVNFD']
-        fileImage = request.files['fileImage']
-
-        if fileVNFD.filename == '' or fileImage.filename == '':
-            flash('There are files missing', 'error')
-            return redirect(request.url)
-
-        if fileVNFD and fileImage:
-            fileVNFDName = secure_filename(fileVNFD.filename)
-            fileImageName = secure_filename(fileImage.filename)
+        else:
             Log.D(f'Upload VNF form data - Name: {form.name.data}, Description: {form.description.data}, '
-                  f'VNFD {fileVNFDName}, image: {fileImageName}')
-            newVNF: VNF = VNF(name=form.name.data, author=current_user, description=form.description.data,
-                              VNFD=fileVNFDName, image=fileImageName)
-            db.session.add(newVNF)
+                  f'VNFD {fileVNFD.filename}, image: {fileImage.filename}')
+            newVnf = VNF(name=form.name.data, author=current_user, description=form.description.data)
+            db.session.add(newVnf)
             db.session.commit()
 
-            Log.I(f'Added VNF {newVNF.name}')
+            newVnf.VNFD = _store(fileVNFD, 'vnfs', 'vnfd', str(newVnf.id))
+            newVnf.image = _store(fileImage, 'vnfs', 'images', str(newVnf.id))
+            db.session.add(newVnf)
+            db.session.commit()
+            Log.I(f'Saved VNF: {str(newVnf)}')
+
             action: Action = Action(timestamp=datetime.utcnow(), author=current_user,
-                                    message=f'<a href="/VNF/repository">Uploaded VNF: {newVNF.name}</a>')
+                                    message=f'<a href="/VNF/repository">Uploaded VNF: {newVnf.name}</a>')
             Log.I(f'Added action - Uploaded VNF')
             db.session.add(action)
             db.session.commit()
 
-            # Store VNFD and Image files
-            baseFolder = os.path.join(UploaderConfig.UPLOAD_FOLDER, 'vnfs', str(newVNF.id))
-            os.makedirs(os.path.join(baseFolder, "vnfd"), mode=0o755, exist_ok=True)
-            os.makedirs(os.path.join(baseFolder, "images"), mode=0o755, exist_ok=True)
-            fileVNFD.save(os.path.join(baseFolder, "vnfd", fileVNFDName))
-            Log.D(f'Saved VNFD file {fileVNFDName} in VNF {newVNF.id}')
-            fileImage.save(os.path.join(baseFolder, "images", fileImageName))
-            Log.D(f'Saved Image file {fileImageName} in VNF {newVNF.id}')
-
             flash('Your VNF has been successfully uploaded', 'info')
             return redirect(url_for('NsManagement.repository'))
 
-        Log.I('Can\'t upload VNF. There are files missing')
-        flash('There are files missing', 'error')
     return render_template('ns_management/upload_vnf.html', title='Home', form=form)
+
+
+@bp.route('/deleteVnf/<vnfId>', methods=['GET'])
+@login_required
+def deleteVnf(vnfId: int):
+    vnf: VNF = VNF.query.get(vnfId)
+    if vnf:
+        if vnf.user_id == current_user.id:
+            db.session.delete(vnf)
+            db.session.commit()
+
+            # Remove stored files
+            shutil.rmtree(os.path.join(UploaderConfig.UPLOAD_FOLDER, 'vnfs', str(vnfId)))
+            Log.I(f'VNF {vnfId} successfully removed')
+            flash(f'The VNF has been successfully removed', 'info')
+
+        else:
+            Log.I(f'Forbidden - User {current_user.name} don\'t have permission to remove VNF {vnfId}')
+            flash(f'Forbidden - You don\'t have permission to remove this VNF', 'error')
+
+    else:
+        return render_template('errors/404.html'), 404
+
+    return redirect(url_for('NsManagement.repository'))
+
+
+@bp.route('/deleteNs/<nsId>', methods=['GET'])
+@login_required
+def deleteNs(nsId: int):
+    ns = NS.query.get(nsId)
+    if ns:
+        if ns.user_id == current_user.id:
+            db.session.delete(ns)
+            db.session.commit()
+
+            # Remove stored files
+            shutil.rmtree(os.path.join(UploaderConfig.UPLOAD_FOLDER, 'nss', str(nsId)))
+            Log.I(f'NS {nsId} successfully removed')
+            flash(f'The NS has been successfully removed', 'info')
+
+        else:
+            Log.I(f'Forbidden - User {current_user.name} don\'t have permission to remove NS {nsId}')
+            flash(f'Forbidden - You don\'t have permission to remove this NS', 'error')
+
+    else:
+        return render_template('errors/404.html'), 404
+
+    return redirect(url_for('NsManagement.repository'))

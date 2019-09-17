@@ -3,7 +3,7 @@
         <th class="col-md-1">Description</th>
         <td class="col-md-10" style="background-color: white">{{ entity.description }}</td>
         <th class="col-md-1" style="border-left: 2px solid #005b90 !important; border-right: 0px !important;">
-            <a class="btn btn-delete" role="button" onclick="confirmDeleteVnf({{ entity.id }})">
+            <a class="btn btn-delete" role="button" onclick="confirmDeleteNs({{ entity.id }})">
                 <b>Delete</b>
             </a>
         </th>
@@ -11,12 +11,10 @@
 </table>
 <table class="table table-striped table-header">
     <tr>
-        <th>VNFD Path</th>
-        <th>Image Path</th>
+        <th>NSD Path</th>
     </tr>
     <tr>
-        <td class="table-cell-divisor-right">{{ entity.VNFD }}</td>
-        <td>{{ entity.image }}</td>
+        <td>{{ entity.NSD }}</td>
     </tr>
 </table>
 

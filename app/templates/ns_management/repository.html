@@ -10,27 +10,38 @@
     document.getElementById('navbar-createExperiment').classList.remove('menuSelected');
 })();
 
-function confirmDelete(VNFId){
+function confirmDeleteVnf(VNFId){
     if (window.confirm("Do you really want to remove the VNF?")) {
-        window.location.replace("/VNF/delete/"+VNFId);
+        window.location.replace("/NS/deleteVnf/"+VNFId);
     }
 }
+
+function confirmDeleteNs(VNFId){
+    if (window.confirm("Do you really want to remove the NS?")) {
+        window.location.replace("/NS/deleteNs/"+VNFId);
+    }
+}
+
 
 </script>
 {% endblock %}
 
-{% macro accordionCard(accordion, card, VNFInfo) %}
+{% macro accordionCard(accordion, card, entity, type) %}
 <div class="card">
     <div class="panel panel-info">
         <div class="panel-heading" id="{{ card }}Header" style="padding: 0px !important">
             <button class="btn btn-panel" type="button" data-toggle="collapse" style="width: 100%;"
-                    data-target="#{{ card }}_VNF" aria-expanded="false" aria-controls="{{ card }}_VNF">
-                <b>VNF:</b> {{ VNFInfo.name }}
+                    data-target="#{{ card }}_{{ type }}" aria-expanded="false" aria-controls="{{ card }}_{{ type }}">
+                <b>{{ type }}:</b> {{ entity.name }}
             </button>
         </div>
-        <div id="{{ card }}_VNF" class="collapse" aria-labelledby="{{ card }}Header" data-parent="#{{ accordion }}">
+        <div id="{{ card }}_{{ type }}" class="collapse" aria-labelledby="{{ card }}Header" data-parent="#{{ accordion }}">
             <div class="card-body">
-                {% include 'VNF/_VNF.html' %}
+                {% if type == 'VNF' %}
+                    {% include 'ns_management/_VNF.html' %}
+                {% else %}
+                    {% include 'ns_management/_NS.html' %}
+                {% endif %}
             </div>
         </div>
     </div>
@@ -49,7 +60,7 @@ function confirmDelete(VNFId){
             <br>
             <div class="accordion" id="VNFAccordion">
                 {% for VNF in VNFs %}
-                {{ accordionCard('VNFAccordion', VNF.name.replace(' ',''), VNF) }}
+                {{ accordionCard('VNFAccordion', VNF.name.replace(' ',''), VNF, 'VNF') }}
                 {% endfor %}
             </div>
         </div>
@@ -64,9 +75,9 @@ function confirmDelete(VNFId){
             <a class="btn btn-blue" href="{{ url_for('NsManagement.upload_NS') }}" role="button">Upload NS</a>
             <br>
             <br>
-            <div class="accordion" id="VNFAccordion">
+            <div class="accordion" id="NSaccordion">
                 {% for NS in NSs %}
-                {{ accordionCard('NSAccordion', NS.name.replace(' ',''), NS) }}
+                {{ accordionCard('NSAccordion', NS.name.replace(' ',''), NS, 'NS') }}
                 {% endfor %}
             </div>
         </div>
