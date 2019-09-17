@@ -96,6 +96,12 @@ def load_user(id: int) -> User:
     return User.query.get(int(id))
 
 
+experiment_ns = db.Table('experiments_ns',
+                         db.Column('experiment_id', db.Integer, db.ForeignKey('experiment.id')),
+                         db.Column('ns_id', db.Integer, db.ForeignKey('NS.id'))
+                         )
+
+
 class Experiment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
@@ -107,6 +113,7 @@ class Experiment(db.Model):
     NSD = db.Column(db.String(256))
     slice = db.Column(db.String(64))
     executions = db.relationship('Execution', backref='experiment', lazy='dynamic')
+    network_services = db.relationship('NS', secondary=experiment_ns)
 
     def __repr__(self):
         return f'<Id: {self.id}, Name: {self.name}, User_id: {self.user_id}, Type: {self.type}, ' \
@@ -116,25 +123,23 @@ class Experiment(db.Model):
         exp: List = Execution.query.filter_by(experiment_id=self.id)
         return exp.order_by(Execution.id.desc())
 
+    def experimentNSs(self) -> List:
+        nss: List = experiment_ns.query.filter_by(experiment_id=self.id)
+        return nss
+
     def serialization(self) -> Dict[str, object]:
         ueDictionary = {}
-        vnfsLocations = []
-        allUEs: List = HelperConfig().UEs
+        allUEs: Dict = HelperConfig().UEs
         executionIds: List = [exe.id for exe in self.experimentExecutions()]
 
         if self.ues:
             for ue in self.ues:
                 if ue in allUEs.keys(): ueDictionary[ue] = allUEs[ue]
 
-        for vnfLoc in self.experimentVNFs():
-            vnfLocation: Dict[str, object] = VNF.query.get(vnfLoc.VNF_id).serialization()
-            vnfLocation['Location'] = vnfLoc.location
-            vnfsLocations.append(vnfLocation)
-
         dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(),
                       'Executions': executionIds, "Platform": HelperConfig().Platform,
                       "TestCases": self.test_cases, "UEs": ueDictionary, "Slice": self.slice, "NSD": self.NSD,
-                      "VNF_Locations": vnfsLocations}
+                      "NetworkServices": self.network_services}
         return dictionary
 
 
