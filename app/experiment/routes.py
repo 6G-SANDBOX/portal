@@ -51,6 +51,8 @@ def create():
             ns_i = 'NS' + str(i + 1)
             ns = NS.query.get(request.form[ns_i])
             if ns:
+                if i == 0:  # TODO: Remove experiment.NSD and use only network_services
+                    experiment.NSD = ns.NSD
                 experiment.network_services.append(ns)
 
         db.session.add(experiment)
@@ -105,12 +107,16 @@ def experiment(experimentId: int):
 
 @bp.route('/<experimentId>/nsdFile', methods=['GET'])
 def downloadNSD(experimentId: int):
-    file = Experiment.query.get(experimentId).NSD
-    if file is None:
-        return render_template('errors/404.html'), 404
-    else:
-        baseFolder = os.path.realpath(os.path.join(UploaderConfig.UPLOAD_FOLDER, 'experiment', str(experimentId),'nsd'))
-        return send_from_directory(directory=baseFolder, filename=file, as_attachment=True)
+    experiment = Experiment.query.get(experimentId)
+    if experiment is None: return render_template('errors/404.html'), 404
+
+    # TODO: Handle experiments with multiple network services
+    ns = experiment.network_services[0] if len(experiment.network_services) != 0 else None
+    if ns is None: return render_template('errors/404.html'), 404
+    filename = ns.NSD
+
+    baseFolder = os.path.realpath(os.path.join(UploaderConfig.UPLOAD_FOLDER, 'nss', str(ns.id), 'nsd'))
+    return send_from_directory(directory=baseFolder, filename=filename, as_attachment=True)
 
 
 def runExperiment(config: Config):

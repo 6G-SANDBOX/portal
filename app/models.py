@@ -120,26 +120,27 @@ class Experiment(db.Model):
             f'Unattended: {self.unattended}, TestCases: {self.test_cases}, NSD: {self.NSD}, Slice: {self.slice}>'
 
     def experimentExecutions(self) -> List:
-        exp: List = Execution.query.filter_by(experiment_id=self.id)
-        return exp.order_by(Execution.id.desc())
+        exp: db.BaseQuery = Execution.query.filter_by(experiment_id=self.id)
+        return list(exp.order_by(Execution.id.desc()))
 
     def experimentNSs(self) -> List:
-        nss: List = experiment_ns.query.filter_by(experiment_id=self.id)
-        return nss
+        nss: db.BaseQuery = experiment_ns.query.filter_by(experiment_id=self.id)
+        return list(nss)
 
     def serialization(self) -> Dict[str, object]:
         ueDictionary = {}
         allUEs: Dict = HelperConfig().UEs
         executionIds: List = [exe.id for exe in self.experimentExecutions()]
 
-        if self.ues:
-            for ue in self.ues:
-                if ue in allUEs.keys(): ueDictionary[ue] = allUEs[ue]
+        for ue in self.ues:
+            if ue in allUEs.keys(): ueDictionary[ue] = allUEs[ue]
+
+        networkServices = [ns.serialization() for ns in self.network_services]
 
         dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(),
                       'Executions': executionIds, "Platform": HelperConfig().Platform,
                       "TestCases": self.test_cases, "UEs": ueDictionary, "Slice": self.slice, "NSD": self.NSD,
-                      "NetworkServices": self.network_services}
+                      "NetworkServices": networkServices}
         return dictionary
 
 
@@ -201,5 +202,5 @@ class NS(db.Model):
 
     def serialization(self) -> Dict[str, object]:
         dictionary = {'Id': self.id, 'Name': self.name, 'Description': self.description, 'NSD': self.NSD,
-                      "Image": self.image, "User": self.user_id}
+                      "User": self.user_id}
         return dictionary
