@@ -14,7 +14,7 @@ with others developed internally in 5 Genesis (i.e. the version that was availab
 used while testing this component). It's possible that most (or all) features work with some previous versions, and most
 probably there will be no issues when using more recent versions.
 
- - [ELCM](https://gitlab.fokus.fraunhofer.de/5genesis/elcm) Version 1.0.5 (27/06/2019)
+ - [ELCM](https://gitlab.fokus.fraunhofer.de/5genesis/elcm) Version 1.1.0 (02/10/2019)
 
 ## Installing (development)
 > A video detailing the deployment procedure of the Portal (and ELCM) can be seen [in BSCW](https://bscw.fokus.fraunhofer.de/bscw/bscw.cgi/d3208170/Coordinationlayer_call20190422.mp4)
