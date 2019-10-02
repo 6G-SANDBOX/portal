@@ -16,20 +16,20 @@ $(document).ready(
   }
 );
 
-function addVNFs(actual, target, vnfs, vnfsId) {
+function addNs(actual, target, nss, nsIds) {
   for (i = actual + 1; i <= target; i++) {
-    newItemHTML = '<tr><td class="table-cell-divisor-right"><center>' + i + '</center></td><td class="table-cell-divisor-right"><select class="vnf InputBox form-control" name="VNF' + i + '">'
-    for (j = 0; j < vnfs.length; j++) {
-      newItemHTML = newItemHTML + '<option value="' + vnfsId[j] + '">' + vnfs[j] + '</option>';
+    newItemHTML = '<tr><td class="table-cell-divisor-right"><center>' + i + '</center></td><td class="table-cell-divisor-right"><select class="ns InputBox form-control" name="NS' + i + '">'
+    for (j = 0; j < nss.length; j++) {
+      newItemHTML = newItemHTML + '<option value="' + nsIds[j] + '">' + nss[j] + '</option>';
     }
-    newItemHTML = newItemHTML + '</select></td><td><select class="form-control" name="location' + i + '"><option value="Data Network" selected>Data Network</option><option value="Edge">Edge</option></select></td></tr>'
-    $("table#vnf tr").last().after(newItemHTML);
+    newItemHTML = newItemHTML + '</select></td></tr>';
+    $("table#ns tr").last().after(newItemHTML);
   }
 }
 
-function removeVNFs(target) {
+function removeNs(target) {
   if (target >= 0) {
-    $('.vnf').slice(target).parent().parent().remove();
+    $('.ns').slice(target).parent().parent().remove();
   }
 }
 

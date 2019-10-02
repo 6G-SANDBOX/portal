@@ -24,9 +24,9 @@ def execution(executionId: int):
             try:
                 # Get Execution logs information
                 config = Config()
-                api = DispatcherApi(config.Dispatcher.Host, config.Dispatcher.Port, "/experiment")
+                api = DispatcherApi(config.Dispatcher.Host, config.Dispatcher.Port, "/execution")
                 jsonResponse: Dict = api.Get(executionId)
-                Log.D(f'Access exeuction logs response {jsonResponse}')
+                Log.D(f'Access execution logs response {jsonResponse}')
                 status = jsonResponse["Status"]
                 if status == 'Not Found':
                     Log.I(f'Execution not found')

@@ -1,3 +1,7 @@
+**02/10/2019** [Version 1.1.0]
+
+ - Modified VNF/NS handling
+
 **29/05/2019** [Version 1.0.8]
 
  - Auto-update displayed experiment execution information with values provided by the ELCM.

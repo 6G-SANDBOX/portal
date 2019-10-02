@@ -8,7 +8,7 @@ from config import Config as UploaderConfig
 from REST import DispatcherApi
 from app import db
 from app.experiment import bp
-from app.models import Experiment, Execution, Action, VNFLocation
+from app.models import Experiment, Execution, Action, NS
 from app.experiment.forms import ExperimentForm, RunExperimentForm
 from app.execution.routes import getLastExecution
 from Helper import Config, Log
@@ -18,14 +18,14 @@ from Helper import Config, Log
 @login_required
 def create():
     listUEs: List[str] = list(Config().UEs.keys())
-    vnfs: List[str] = []
-    vnfsId: List[int] = []
+    nss: List[str] = []
+    nsIds: List[int] = []
 
     # Get User's VNFs
-    if current_user.userVNFs():
-        for vnf in current_user.userVNFs():
-            vnfs.append(vnf.name)
-            vnfsId.append(vnf.id)
+
+    for ns in current_user.userNSs():
+        nss.append(ns.name)
+        nsIds.append(ns.id)
 
     form = ExperimentForm()
     if form.validate_on_submit():
@@ -45,40 +45,19 @@ def create():
         if formSlice is not None:
             experiment.slice = formSlice
 
+        # Manage multiple VNF-Location selection
+        count = int(request.form.get('nsCount', '0'))
+        for i in range(count):
+            ns_i = 'NS' + str(i + 1)
+            ns = NS.query.get(request.form[ns_i])
+            if ns:
+                if i == 0:  # TODO: Remove experiment.NSD and use only network_services
+                    experiment.NSD = ns.NSD
+                experiment.network_services.append(ns)
+
         db.session.add(experiment)
         db.session.commit()
         Log.I(f'Added experiment {experiment.id}')
-
-        # Manage multiple VNF-Location selection
-        if 'vnfCount' in request.form:
-            count = int(request.form['vnfCount'])
-
-        else:
-            count = 0
-
-        for i in range(count):
-            loc = 'location' + str(i + 1)
-            vnf = 'VNF' + str(i + 1)
-            vnfLoc: VNFLocation = VNFLocation(location=request.form[loc], VNF_id=request.form[vnf],
-                                              experiment_id=experiment.id)
-            Log.D(f'Selected VNF {request.form[vnf]} with location {request.form[loc]}')
-            db.session.add(vnfLoc)
-            db.session.commit()
-            Log.I(f'Added VNF-Location {vnfLoc.id} to experiment {experiment.id}')
-
-        baseFolder = os.path.join(UploaderConfig.UPLOAD_FOLDER, 'experiment', str(experiment.id))
-        os.makedirs(os.path.join(baseFolder, "nsd"), mode=0o755, exist_ok=True)
-
-        # Store NSD file
-        if 'fileNSD' in request.files:
-            fileNSD = request.files['fileNSD']
-            if fileNSD.filename != '':
-                fileNSDName = secure_filename(fileNSD.filename)
-                fileNSD.save(os.path.join(baseFolder, "nsd", fileNSDName))
-                experiment.NSD = fileNSDName
-                db.session.add(experiment)
-                db.session.commit()
-                Log.I(f'Added NSD file {fileNSDName} to experiment {experiment.id}')
 
         action: Action = Action(timestamp=datetime.utcnow(), author=current_user,
                                 message=f'<a href="/experiment/{experiment.id}">Created experiment: {form.name.data}</a>')
@@ -89,7 +68,7 @@ def create():
         return redirect(url_for('main.index'))
 
     return render_template('experiment/create.html', title='Home', form=form, testCaseList=Config().TestCases,
-                           ueList=listUEs, sliceList=Config().Slices, vnfs=vnfs, vnfsId=vnfsId)
+                           ueList=listUEs, sliceList=Config().Slices, nss=nss, nsIds=nsIds)
 
 
 @bp.route('/<experimentId>/reload', methods=['GET', 'POST'])
@@ -113,10 +92,9 @@ def experiment(experimentId: int):
 
             # Get Experiment's executions
             executions: List[Experiment] = exp.experimentExecutions()
-            if executions.count() == 0:
+            if len(executions) == 0:
                 flash(f'The experiment {exp.name} doesn\'t have any executions yet', 'info')
                 return redirect(url_for('main.index'))
-
             else:
                 return render_template('experiment/experiment.html', title='experiment', experiment=exp,
                                        executions=executions, formRun=formRun, grafanaUrl=config.GrafanaUrl,
@@ -129,12 +107,16 @@ def experiment(experimentId: int):
 
 @bp.route('/<experimentId>/nsdFile', methods=['GET'])
 def downloadNSD(experimentId: int):
-    file = Experiment.query.get(experimentId).NSD
-    if file is None:
-        return render_template('errors/404.html'), 404
-    else:
-        baseFolder = os.path.realpath(os.path.join(UploaderConfig.UPLOAD_FOLDER, 'experiment', str(experimentId),'nsd'))
-        return send_from_directory(directory=baseFolder, filename=file, as_attachment=True)
+    experiment = Experiment.query.get(experimentId)
+    if experiment is None: return render_template('errors/404.html'), 404
+
+    # TODO: Handle experiments with multiple network services
+    ns = experiment.network_services[0] if len(experiment.network_services) != 0 else None
+    if ns is None: return render_template('errors/404.html'), 404
+    filename = ns.NSD
+
+    baseFolder = os.path.realpath(os.path.join(UploaderConfig.UPLOAD_FOLDER, 'nss', str(ns.id), 'nsd'))
+    return send_from_directory(directory=baseFolder, filename=filename, as_attachment=True)
 
 
 def runExperiment(config: Config):
