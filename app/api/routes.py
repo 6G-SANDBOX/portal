@@ -43,13 +43,14 @@ def setExecutionStatus(executionId: int) -> Dict[str, str]:
 @bp.route('/<int:executionId>/json')
 def executionJson(executionId: int) -> Dict[str, object]:
     execution: Execution = Execution.query.get(executionId)
-    percent = 0
-    message = []
     if execution is not None:
         status = execution.status
         percent = execution.percent
         message = execution.message
-
+    else:
+        percent = 0
+        message = []
+        status = 'ERR'
     return jsonify({'Status': status, 'PerCent': percent, 'Message': message})
 
 
