@@ -16,8 +16,23 @@ def register():
 
     form = RegistrationForm()
     if form.validate_on_submit():
+        def _exist():
+            if User.query.filter_by(username=form.username.data).first() is not None:
+                form.username.errors.append("Username already registered")
+                return True
+            elif User.query.filter_by(email=form.email.data).first() is not None:
+                form.email.errors.append("Email already registered")
+                return True
+            else:
+                return False
+
         Log.D(f'Registration form data - Username: {form.username.data}, Email: {form.email.data},'
               f' Organization: {form.organization.data}')
+
+        if _exist():
+            return render_template('authentication/register.html', title='Register', form=form,
+                                   description=Config().Description)
+
         user: User = User(username=form.username.data, email=form.email.data, organization=form.organization.data)
         user.setPassword(form.password.data)
         db.session.add(user)

@@ -1,3 +1,7 @@
+**31/10/2019** [Version 1.1.1]
+
+ - Avoid exception when creating duplicated users
+
 **02/10/2019** [Version 1.1.0]
 
  - Modified VNF/NS handling
