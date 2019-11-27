@@ -1,0 +1,19 @@
+<tr>
+    <th scope="row" class="col-md-2">
+        {{ experiment.id }}
+    </th>
+    <td class="col-md-4">
+        {{ experiment.name }}
+    </td>
+    <td class="col-md-2">
+        {{ experiment.type }}
+    </td>
+    <td class="col-md-4">
+        <form id="formRun" method="post" novalidate>
+            {{ formRun.hidden_tag() }}
+            <input type="hidden" name="id" value="{{ experiment.id }}"/>
+            <button type="submit" name="submit" class="btn btn-darkBlue btn-sm">Run Experiment</button>
+            <a class="btn btn-blue btn-sm" href="/experiment/{{ experiment.id }}" role="button">Executions</a>
+        </form>
+    </td>
+</tr>

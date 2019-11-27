@@ -1,0 +1,28 @@
+Dispatcher:
+  Host: '127.0.0.1'
+  Port: 5001
+
+TestCases:
+  - RTT
+
+Slices:
+  - Slice1
+  - Slice2
+
+UEs:
+  TestServer1:
+    OS: Linux
+
+Grafana URL:
+  None
+
+Platform:
+  Málaga [UMA]
+
+Description:
+  5th Generation End-to-end Network, Experimentation, System Integration, and Showcasing
+
+Logging:
+  Folder: 'Logs'
+  AppLevel: INFO
+  LogLevel: DEBUG

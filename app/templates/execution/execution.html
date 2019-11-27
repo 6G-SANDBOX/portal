@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% import 'execution/_logView.html' as logView %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/log.css') }}">
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{url_for('static', filename='js/loading.js')}}"></script>
+<script src="{{url_for('static', filename='js/updateExecutionStatus.js')}}"></script>
+{{ logView.logScripts() }}
+
+{% if execution.status not in ['Finished', 'Cancelled', 'Errored'] %}
+<script>
+function update{{ execution.id }}(nanobar) {
+    $.get("{{ url_for('api.executionJson', executionId=execution.id) }}")
+        .done(function (response) {
+            if (response['Status'] === 'Finished'){
+                updateOne($("#table_status{{ execution.id }}"), response['Status']);
+                $("#table_status{{ execution.id }}").addClass("label-success");
+                $("#table_status{{ execution.id }}").removeClass("label-primary");
+                $("#progress{{ execution.id }}").fadeTo(500, 0).slideUp(500, function(){ $(this).remove(); });
+            } else {
+                updateOne($("#table_status{{ execution.id }}"), response['Status']);
+                updatePerCent(nanobar, response['PerCent'], $('#percent{{ execution.id }}'));
+                updateMessage($('#message{{ execution.id }}'), response['Message']);
+                setTimeout(function() { update{{ execution.id }}(nanobar); }, 5000);
+            }
+        }
+    );
+}
+
+</script>
+<script>
+div = $(
+    "<span class='message' id='message{{ execution.id }}'></span>" +
+    "<span class='progress'></span>" +
+    "<span id='percent{{ execution.id }}' style='display: none;'></span>"
+);
+$('#progress{{ execution.id }}').append(div);
+var nanobar = Nanobar({ target: div[1] });
+update{{ execution.id }}(nanobar);
+
+</script>
+{% endif %}
+{% endblock %}
+
+{% macro accordionCard(accordion, card, logInfo) %}
+{% set LogLevels = ['Debug', 'Info', 'Warning', 'Error', 'Critical'] %}
+<div class="card">
+    <div class="panel panel-info">
+        {{ logView.logView(card, logInfo) }}
+    </div>
+</div>
+{% endmacro %}
+
+{% block app_content %}
+<div style="text-align: center">
+    <h2>Execution {{ execution.id }}</h2>
+</div>
+<div class="opaque" hidden></div>
+<div class="loader" hidden></div>
+<table class="table table-header">
+    <thead class="thead-dark">
+    <tr>
+        <th>Status</th>
+        <th>Start Time</th>
+        <th>End Time</th>
+        <th>Experiment</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="col-md-3">
+            {% if execution.status == 'Init' %}
+            <span class="label label-default" id="table_status{{ execution.id }}">{{ execution.status }}</span>
+            {% elif execution.status in ['PreRun', 'Run', 'PostRun'] %}
+            <span class="label label-primary" id="table_status{{ execution.id }}">{{ execution.status }}</span>
+            {% elif execution.status == 'Finished' %}
+            <span class="label label-success">{{ execution.status }}</span>
+            {% elif execution.status == 'Cancelled' %}
+            <span class="label label-warning">{{ execution.status }}</span>
+            {% elif execution.status == 'Errored' %}
+            <span class="label label-danger">{{ execution.status }}</span>
+            {% endif %}
+            {% if execution.status not in ['Finished', 'Cancelled', 'Errored'] %}
+            <span id="progress{{ execution.id }}"></span>
+            {% endif %}
+        </td>
+        <td class="col-md-2">
+            {{ moment(execution.start_time).format('DD MMMM YYYY, h:mm:ss') }}
+        </td>
+        <td class="col-md-2">
+            {% if execution.end_time%}
+            {{ moment(execution.end_time).format('DD MMMM YYYY, h:mm:ss') }}
+            {% else %}
+            -
+            {% endif %}
+        </td>
+        <td class="col-md-3">
+            {{ experiment.name }}
+        </td>
+        <td class="col-md-2">
+            {% if grafanaUrl == None or not execution.dashboard_url %}
+            <a class="btn btn-primary btn-sm disabled" href="#" role="button">Results</a>
+            {% else %}
+            <a class="btn btn-blue btn-sm" href="{{ grafanaUrl }}{{ execution.dashboard_url }}" role="button"
+               target="_blank">Results</a>
+            {% endif %}
+        </td>
+    </tr>
+    </tbody>
+</table>
+<hr>
+</br>
+
+{{ accordionCard('logAccordion', 'Pre-Run', preRun) }}
+{{ accordionCard('logAccordion', 'Run', executor) }}
+{{ accordionCard('logAccordion', 'Post-Run', postRun) }}
+
+{% endblock %}

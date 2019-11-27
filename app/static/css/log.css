@@ -1,0 +1,57 @@
+.logLine {
+    font-family: Consolas;
+    background: black;
+    font-size: small;
+    padding:0;
+    margin:0;
+}
+
+.logDebug { }
+.logInfo { }
+.logWarning { }
+.logError { }
+.logCritical { }
+
+.colorDebug {
+    color: dodgerblue;
+}
+
+.colorInfo {
+    color: white;
+}
+
+.colorWarning {
+    color: gold;
+}
+
+.colorError {
+    color: red;
+}
+
+.colorCritical {
+    color: darkorchid;
+}
+
+.btnDebug {
+    border-bottom: 3px solid dodgerblue !important
+}
+
+.btnInfo {
+    border-bottom: 3px solid white !important
+}
+
+.btnWarning {
+    border-bottom: 3px solid gold !important
+}
+
+.btnError {
+    border-bottom: 3px solid red !important
+}
+
+.btnCritical {
+    border-bottom: 3px solid darkOrchid !important
+}
+
+.hidden {
+    display: none;
+}

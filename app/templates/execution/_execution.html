@@ -1,0 +1,45 @@
+<tr>
+    <th scope="row" class="col-md-2">
+        {{ execution.id }}
+    </th>
+    <td class="col-md-3">
+        {% if execution.status == 'Init' %}
+        <span class="label label-default" id="table_status{{ execution.id }}">{{ execution.status }}</span>
+        {% elif execution.status in ['PreRun', 'Run', 'PostRun'] %}
+        <span class="label label-primary" id="table_status{{ execution.id }}">{{ execution.status }}</span>
+        {% elif execution.status == 'Finished' %}
+        <span class="label label-success">{{ execution.status }}</span>
+        {% elif execution.status == 'Cancelled' %}
+        <span class="label label-warning">{{ execution.status }}</span>
+        {% elif execution.status == 'Errored' %}
+        <span class="label label-danger">{{ execution.status }}</span>
+        {% endif %}
+        {% if execution.status not in ['Finished', 'Cancelled', 'Errored'] %}
+        <span id="progress{{ execution.id }}"></span>
+        {% endif %}
+    </td>
+    <td class="col-md-2">
+        {{ moment(execution.start_time).format('DD MMMM YYYY, h:mm:ss') }}
+    </td>
+    <td class="col-md-2">
+        {% if execution.end_time %}
+        {{ moment(execution.end_time).format('DD MMMM YYYY, h:mm:ss') }}
+        {% else %}
+        -
+        {% endif %}
+    </td>
+    <td class="col-md-3">
+        {% if execution.status not in ['Finished', 'Cancelled', 'Errored'] %}
+        <a class="btn btn-darkBlue btn-sm" href="/execution/{{ execution.id }}/reloadLog" role="button">Execution
+            Logs</a>
+        {% else %}
+        <a class="btn btn-darkBlue btn-sm" href="/execution/{{ execution.id }}" role="button">Execution Logs</a>
+        {% endif %}
+        {% if grafanaUrl == None or not execution.dashboard_url %}
+        <a class="btn btn-primary btn-sm disabled" href="#" role="button">Results</a>
+        {% else %}
+        <a class="btn btn-blue btn-sm" href="{{ grafanaUrl }}{{ execution.dashboard_url }}" role="button"
+           target="_blank">Results</a>
+        {% endif %}
+    </td>
+</tr>
