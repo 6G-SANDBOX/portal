@@ -137,10 +137,33 @@ class Experiment(db.Model):
 
         networkServices = [ns.serialization() for ns in self.network_services]
 
+        # dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(),
+        #               'Executions': executionIds, "Platform": HelperConfig().Platform,
+        #               "TestCases": self.test_cases, "UEs": ueDictionary, "Slice": self.slice, "NSD": self.NSD,
+        #               "NetworkServices": networkServices}
+
+        '''Note: Some data has been mocked to make this version of the portal compatible with different versions of 
+        the dispatcher.'''
+        version = 210
+        experiment_type = "Standard"
+        nss = []
+        exclusive_execution = True
+        scenario = None
+        automated = True
+        reservation_time = None
+        application = None
+        parameters = {}
+        remote = None
+        extra = {}
+
         dictionary = {'Id': self.id, 'Name': self.name, 'User': User.query.get(self.user_id).serialization(),
                       'Executions': executionIds, "Platform": HelperConfig().Platform,
                       "TestCases": self.test_cases, "UEs": ueDictionary, "Slice": self.slice, "NSD": self.NSD,
-                      "NetworkServices": networkServices}
+                      "NetworkServices": networkServices, "Version": version, "ExclusiveExecution": exclusive_execution,
+                      "Scenario": scenario, "ExperimentType": experiment_type, "NSs": nss, "Automated": automated,
+                      "ReservationTime": reservation_time, "Extra": extra, "Application": application,
+                      "Parameters": parameters, "Remote": remote }
+
         return dictionary
 
 
