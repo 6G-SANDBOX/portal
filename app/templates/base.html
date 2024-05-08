@@ -8,7 +8,7 @@
 
 <html>
 {% block title %}
-5GENESIS Portal
+6G-PATH Portal
 {% endblock %}
 
 {% block styles %}
@@ -37,14 +37,14 @@
             </button>
             {% if current_user.is_anonymous %}
             <a href="{{ url_for('authentication.login') }}"><img
-                    src=" {{ url_for('static', filename='images/5genesisTransparent.png') }} " alt="5Genesis"
+                    src=" {{ url_for('static', filename='images/6Gpath-transparent.png') }} " alt="6G-Path"
                     height="50" width="39" style="float: left; padding: 5px"></a>
-            <a class="navbar-brand" href="{{ url_for('authentication.login') }}">5Genesis</a>
+            <a class="navbar-brand" href="{{ url_for('authentication.login') }}">6G-Path</a>
             {% else %}
             <a href="{{ url_for('main.index') }}"><img
-                    src="{{ url_for('static', filename='images/5genesisTransparent.png') }}" alt="5Genesis" height="50"
+                    src="{{ url_for('static', filename='images/6Gpath-transparent.png') }}" alt="6G-Path" height="50"
                     width="39" style="float: left; padding: 5px"></a>
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">5Genesis</a>
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">6G-Path</a>
             {% endif %}
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
