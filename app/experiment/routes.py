@@ -123,10 +123,10 @@ def runExperiment(config: Config):
     try:
         api = DispatcherApi(config.Dispatcher.Host, config.Dispatcher.Port, "/api/v0")  # //api/v0
         jsonResponse: Dict = api.Post(request.form['id'])
-        Log.D(f'Ran experiment response {jsonResponse}')
+        Log.I(f'Ran experiment response {jsonResponse}')
         Log.I(f'Ran experiment {request.form["id"]}')
-        flash(f'Success: {jsonResponse["Success"]} - Execution Id: '
-              f'{jsonResponse["ExecutionId"]} - Message: {jsonResponse["Message"]}', 'info')
+        # flash(f'Success: {jsonResponse["Success"]} - Execution Id: '
+        #       f'{jsonResponse["ExecutionId"]} - Message: {jsonResponse["Message"]}', 'info')
         execution: Execution = Execution(id=jsonResponse["ExecutionId"], experiment_id=request.form['id'],
                                          status='Init')
         db.session.add(execution)
